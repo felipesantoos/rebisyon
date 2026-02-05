@@ -23,7 +23,7 @@ gem "solid_cable"
 gem "mission_control-jobs"
 
 # Authentication
-gem "devise", "~> 4.9"
+gem "devise", "~> 5.0"
 gem "devise-jwt", "~> 0.12"
 
 # Features
