@@ -1,0 +1,69 @@
+en:
+  errors:
+    not_authorized: "You are not authorized to perform this action"
+    record_not_found: "The requested record was not found"
+  
+  flash:
+    create_success: "%{resource} was successfully created"
+    update_success: "%{resource} was successfully updated"
+    delete_success: "%{resource} was successfully deleted"
+    
+  dashboard:
+    title: "Dashboard"
+    welcome: "Welcome back!"
+    subtitle: "Ready to study? Here's your daily overview."
+    study_now: "Study Now"
+    due_today: "Due Today"
+    cards_to_review: "cards to review"
+    new_cards: "New Cards"
+    ready_to_learn: "ready to learn"
+    learning: "Learning"
+    in_progress: "in progress"
+    your_decks: "Your Decks"
+    create_deck: "+ Create Deck"
+    no_decks_title: "No decks yet"
+    no_decks_description: "Create your first deck to start adding flashcards and studying with spaced repetition."
+    create_first_deck: "Create your first deck"
+    getting_started: "Getting Started"
+    step_1_title: "Create a deck"
+    step_1_description: "Organize your cards into topic-based decks"
+    step_2_title: "Add notes"
+    step_2_description: "Create flashcards with questions and answers"
+    step_3_title: "Study daily"
+    step_3_description: "Review cards when they're due for optimal retention"
+    
+  navigation:
+    study: "Study"
+    manage: "Manage"
+    analytics: "Analytics"
+    dashboard: "Dashboard"
+    decks: "Decks"
+    browse: "Browse"
+    note_types: "Note Types"
+    statistics: "Statistics"
+    preferences: "Preferences"
+    account: "Account"
+    sign_out: "Sign out"
+    add_note: "Add Note"
+    
+  user_preferences:
+    title: "Preferences"
+    
+  activerecord:
+    models:
+      user: "User"
+      deck: "Deck"
+      note: "Note"
+      card: "Card"
+      note_type: "Note Type"
+      user_preference: "User Preference"
+    attributes:
+      user:
+        email: "Email"
+        password: "Password"
+        password_confirmation: "Password confirmation"
+        remember_me: "Remember me"
+      user_preference:
+        language: "Language"
+        theme: "Theme"
+        ui_size: "UI Size"

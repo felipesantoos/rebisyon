@@ -1,0 +1,64 @@
+<%= turbo_stream.replace "card-front" do %>
+  <div id="card-front" class="hidden flex-1 flex items-center justify-center p-8">
+    <div class="prose max-w-none text-center">
+      <%= raw @card_front %>
+    </div>
+  </div>
+<% end %>
+
+<%= turbo_stream.replace "card-back" do %>
+  <div id="card-back" class="flex-1 flex items-center justify-center p-8">
+    <div class="prose max-w-none text-center">
+      <%= raw @card_back %>
+    </div>
+  </div>
+<% end %>
+
+<%= turbo_stream.replace "answer-buttons" do %>
+  <div id="answer-buttons" class="hidden mt-6"></div>
+<% end %>
+
+<%= turbo_stream.replace "rating-buttons" do %>
+  <div id="rating-buttons" class="mt-6 flex justify-center space-x-4">
+    <%= form_with url: answer_deck_study_path(@deck), method: :post, 
+        data: { "study-target": "answerForm", "action": "submit->study#submitAnswer" } do |form| %>
+      <%= form.hidden_field :card_id, value: @card.id, data: { "study-target": "cardId" } %>
+      <%= form.hidden_field :time_ms, value: 0, data: { "study-target": "timeMs" } %>
+      
+      <div class="flex space-x-2">
+        <button type="submit" 
+                name="rating" 
+                value="1"
+                data-action="click->study#setRating"
+                data-rating="1"
+                class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors">
+          Again (1)
+        </button>
+        <button type="submit" 
+                name="rating" 
+                value="2"
+                data-action="click->study#setRating"
+                data-rating="2"
+                class="px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 transition-colors">
+          Hard (2)
+        </button>
+        <button type="submit" 
+                name="rating" 
+                value="3"
+                data-action="click->study#setRating"
+                data-rating="3"
+                class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors">
+          Good (3)
+        </button>
+        <button type="submit" 
+                name="rating" 
+                value="4"
+                data-action="click->study#setRating"
+                data-rating="4"
+                class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+          Easy (4)
+        </button>
+      </div>
+    <% end %>
+  </div>
+<% end %>

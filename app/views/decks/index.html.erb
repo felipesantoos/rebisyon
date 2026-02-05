@@ -1,0 +1,32 @@
+<% content_for :title, "Decks" %>
+<% content_for :page_title, "Decks" %>
+
+<div class="space-y-6">
+  <div class="flex items-center justify-between">
+    <h1 class="text-2xl font-semibold text-gray-900">Decks</h1>
+    <%= link_to "New deck", new_deck_path, class: "btn-primary" %>
+  </div>
+
+  <div class="card">
+    <% if @decks.empty? %>
+      <div class="text-center py-12">
+        <p class="text-gray-500 mb-4">No decks yet. Create your first deck to get started.</p>
+        <%= link_to "Create your first deck", new_deck_path, class: "btn-primary inline-block" %>
+      </div>
+    <% else %>
+      <div class="space-y-2">
+        <% @decks.each do |deck| %>
+          <div class="flex items-center justify-between p-4 bg-gray-50 rounded-md hover:bg-gray-100 transition-colors">
+            <div>
+              <h3 class="text-lg font-medium text-gray-900"><%= deck.name %></h3>
+              <% unless deck.full_name == deck.name %>
+                <p class="text-sm text-gray-500"><%= deck.full_name %></p>
+              <% end %>
+            </div>
+            <%= link_to "View", deck_path(deck), class: "text-blue-600 hover:text-blue-700 font-medium" %>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+</div>

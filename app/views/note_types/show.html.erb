@@ -1,0 +1,32 @@
+<% content_for :title, @note_type.name %>
+<% content_for :page_title, @note_type.name %>
+
+<div class="space-y-6">
+  <%# Actions %>
+  <div class="flex items-center space-x-4">
+    <%= link_to "Edit this note type", edit_note_type_path(@note_type), class: "btn-secondary" %>
+    <%= link_to "Back to note types", note_types_path, class: "text-gray-600 hover:text-gray-900" %>
+    <%= button_to "Destroy this note type", note_type_path(@note_type), method: :delete, 
+        class: "btn-danger", 
+        data: { confirm: "Are you sure?" } %>
+  </div>
+
+  <%# Note Type Details %>
+  <div class="card">
+    <h2 class="text-xl font-semibold text-gray-900 mb-4">Note Type Details</h2>
+    <dl class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div>
+        <dt class="text-sm font-medium text-gray-500">Name</dt>
+        <dd class="mt-1 text-sm text-gray-900"><%= @note_type.name %></dd>
+      </div>
+      <div>
+        <dt class="text-sm font-medium text-gray-500">Fields</dt>
+        <dd class="mt-1 text-sm text-gray-900"><%= @note_type.field_names.join(", ") %></dd>
+      </div>
+      <div>
+        <dt class="text-sm font-medium text-gray-500">Card Types</dt>
+        <dd class="mt-1 text-sm text-gray-900"><%= @note_type.card_type_names.join(", ") %></dd>
+      </div>
+    </dl>
+  </div>
+</div>

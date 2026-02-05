@@ -1,0 +1,19 @@
+<% content_for :title, "Editing note type" %>
+<% content_for :page_title, "Edit Note Type" %>
+
+<div class="space-y-6">
+  <div>
+    <h1 class="text-2xl font-semibold text-gray-900">Editing note type</h1>
+    <p class="mt-1 text-sm text-gray-500">Update your note type information.</p>
+  </div>
+
+  <div class="card">
+    <%= render "form", note_type: @note_type %>
+  </div>
+
+  <div class="flex items-center space-x-4">
+    <%= link_to "Show this note type", @note_type, class: "text-blue-600 hover:text-blue-700" %>
+    <span class="text-gray-400">|</span>
+    <%= link_to "Back to note types", note_types_path, class: "text-gray-600 hover:text-gray-900" %>
+  </div>
+</div>

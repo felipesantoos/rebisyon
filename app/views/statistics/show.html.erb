@@ -1,0 +1,147 @@
+<% content_for :title, "Statistics" %>
+<% content_for :page_title, "Statistics" %>
+
+<div data-controller="statistics" data-statistics-period-value="<%= @period %>">
+  <div class="mb-6 flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-semibold text-gray-900">Statistics</h1>
+      <p class="mt-1 text-sm text-gray-500">View your study performance and progress</p>
+    </div>
+    
+    <%# Period Selector %>
+    <div class="flex items-center space-x-2">
+      <span class="text-sm text-gray-700">Period:</span>
+      <%= link_to "Week", statistics_path(period: "week"), 
+          class: "px-3 py-1 rounded-md text-sm #{@period == 'week' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}" %>
+      <%= link_to "Month", statistics_path(period: "month"), 
+          class: "px-3 py-1 rounded-md text-sm #{@period == 'month' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}" %>
+      <%= link_to "Year", statistics_path(period: "year"), 
+          class: "px-3 py-1 rounded-md text-sm #{@period == 'year' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}" %>
+    </div>
+  </div>
+
+  <div class="space-y-6">
+    <%# Reviews Per Day %>
+    <div class="card">
+      <h2 class="text-lg font-semibold text-gray-900 mb-4">Reviews Per Day</h2>
+      <%= line_chart @statistics[:reviews_per_day], 
+          colors: ["#3B82F6"],
+          library: { 
+            title: { text: "Number of reviews completed each day" },
+            yAxis: { title: { text: "Reviews" } },
+            xAxis: { title: { text: "Date" } }
+          } %>
+    </div>
+
+    <%# Review Time Per Day %>
+    <div class="card">
+      <h2 class="text-lg font-semibold text-gray-900 mb-4">Review Time Per Day</h2>
+      <%= line_chart @statistics[:review_time_per_day], 
+          colors: ["#10B981"],
+          library: { 
+            title: { text: "Time spent studying each day" },
+            yAxis: { title: { text: "Minutes" } },
+            xAxis: { title: { text: "Date" } }
+          } %>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <%# Retention Rate %>
+      <div class="card">
+        <h2 class="text-lg font-semibold text-gray-900 mb-4">Retention Rate by Maturity</h2>
+        <%= column_chart @statistics[:retention_rate], 
+            colors: ["#8B5CF6"],
+            library: { 
+              title: { text: "Percentage of correct answers by interval range" },
+              yAxis: { title: { text: "Retention %" }, max: 100 },
+              xAxis: { title: { text: "Interval Range" } }
+            } %>
+      </div>
+
+      <%# Card State Breakdown %>
+      <div class="card">
+        <h2 class="text-lg font-semibold text-gray-900 mb-4">Card State Breakdown</h2>
+        <%= pie_chart @statistics[:card_state_breakdown], 
+            colors: ["#EF4444", "#F59E0B", "#10B981", "#3B82F6"],
+            library: { 
+              title: { text: "Distribution of cards by state" }
+            } %>
+      </div>
+    </div>
+
+    <%# Interval Distribution %>
+    <div class="card">
+      <h2 class="text-lg font-semibold text-gray-900 mb-4">Interval Distribution</h2>
+      <%= column_chart @statistics[:interval_distribution], 
+          colors: ["#6366F1"],
+          library: { 
+            title: { text: "Number of cards by interval range" },
+            yAxis: { title: { text: "Number of Cards" } },
+            xAxis: { title: { text: "Interval Range" } }
+          } %>
+    </div>
+
+    <%# Hourly Breakdown %>
+    <div class="card">
+      <h2 class="text-lg font-semibold text-gray-900 mb-4">Study Time by Hour</h2>
+      <%= column_chart @statistics[:hourly_breakdown], 
+          colors: ["#EC4899"],
+          library: { 
+            title: { text: "When you study throughout the day" },
+            yAxis: { title: { text: "Number of Reviews" } },
+            xAxis: { title: { text: "Hour of Day" } }
+          } %>
+    </div>
+
+    <%# Deck Overview %>
+    <div class="card">
+      <h2 class="text-lg font-semibold text-gray-900 mb-4">Deck Overview</h2>
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Deck</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">New</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Learning</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Review</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Relearn</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Suspended</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Buried</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            <% @statistics[:deck_overview].each do |deck_data| %>
+              <tr>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                  <%= link_to deck_data[:deck].name, deck_path(deck_data[:deck]), class: "text-blue-600 hover:text-blue-900" %>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <%= deck_data[:total_cards] %>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <%= deck_data[:new_cards] %>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <%= deck_data[:learning_cards] %>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <%= deck_data[:review_cards] %>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <%= deck_data[:relearn_cards] %>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <%= deck_data[:suspended_cards] %>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <%= deck_data[:buried_cards] %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

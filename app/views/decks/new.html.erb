@@ -1,0 +1,17 @@
+<% content_for :title, "New deck" %>
+<% content_for :page_title, "New Deck" %>
+
+<div class="space-y-6">
+  <div>
+    <h1 class="text-2xl font-semibold text-gray-900">New deck</h1>
+    <p class="mt-1 text-sm text-gray-500">Create a new deck to organize your cards.</p>
+  </div>
+
+  <div class="card">
+    <%= render "form", deck: @deck %>
+  </div>
+
+  <div>
+    <%= link_to "Back to decks", decks_path, class: "text-gray-600 hover:text-gray-900" %>
+  </div>
+</div>

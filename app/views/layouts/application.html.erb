@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="<%= I18n.locale %>">
+  <head>
+    <title><%= content_for(:title) || "Rebisyon" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= yield :head %>
+    <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
+
+    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+    
+    <%# Chart.js for Chartkick %>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <%= javascript_include_tag "chartkick" %>
+    
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <body class="bg-gray-50">
+    <% if user_signed_in? %>
+      <%# Authenticated layout with sidebar %>
+      <div class="flex min-h-screen">
+        <%# Sidebar %>
+        <%= render "layouts/sidebar" %>
+
+        <%# Main content %>
+        <div class="flex-1 flex flex-col">
+          <%# Top navigation %>
+          <%= render "layouts/navbar" %>
+
+          <%# Flash messages %>
+          <%= render "shared/flash" %>
+
+          <%# Page content %>
+          <main class="flex-1 p-6">
+            <%= yield %>
+          </main>
+        </div>
+      </div>
+    <% else %>
+      <%# Guest layout %>
+      <div class="min-h-screen bg-gray-50">
+        <%= render "shared/flash" %>
+        <%= yield %>
+      </div>
+    <% end %>
+  </body>
+</html>

@@ -1,0 +1,100 @@
+<% content_for :title, "Study: #{@deck.name}" %>
+<% content_for :page_title, "Study: #{@deck.name}" %>
+
+<div data-controller="study" 
+     data-study-card-id-value="<%= @card.id %>"
+     data-study-deck-id-value="<%= @deck.id %>"
+     data-study-show-answer-url-value="<%= show_answer_deck_study_path(@deck) %>"
+     data-study-answer-url-value="<%= answer_deck_study_path(@deck) %>">
+  
+  <div class="max-w-4xl mx-auto">
+    <%# Session Stats %>
+    <div class="mb-4 flex items-center justify-between text-sm text-gray-600">
+      <div>
+        <span class="font-medium">Cards studied:</span> <%= @session_stats[:cards_studied] %>
+      </div>
+      <div>
+        <%= link_to "Finish", deck_path(@deck), class: "text-blue-600 hover:text-blue-700" %>
+      </div>
+    </div>
+
+    <%# Card Display %>
+    <div id="card-display" class="card min-h-[400px] flex flex-col">
+      <% if @card_front %>
+        <div id="card-front" class="flex-1 flex items-center justify-center p-8">
+          <div class="prose max-w-none text-center">
+            <%= raw @card_front %>
+          </div>
+        </div>
+        
+        <div id="card-back" class="hidden flex-1 flex items-center justify-center p-8">
+          <div class="prose max-w-none text-center">
+            <%= raw @card_back if defined?(@card_back) %>
+          </div>
+        </div>
+      <% else %>
+        <div class="flex-1 flex items-center justify-center text-gray-500">
+          No card content available
+        </div>
+      <% end %>
+    </div>
+
+    <%# Answer Buttons %>
+    <div id="answer-buttons" class="mt-6 flex justify-center space-x-4">
+      <button type="button" 
+              data-action="click->study#showAnswer"
+              data-study-target="showAnswerBtn"
+              class="btn-primary">
+        Show Answer
+      </button>
+    </div>
+
+    <div id="rating-buttons" class="hidden mt-6 flex justify-center space-x-4" data-study-target="ratingButtons">
+      <%= form_with url: answer_deck_study_path(@deck), method: :post, 
+          data: { "study-target": "answerForm", "action": "submit->study#submitAnswer" } do |form| %>
+        <%= form.hidden_field :card_id, value: @card.id, data: { "study-target": "cardId" } %>
+        <%= form.hidden_field :time_ms, value: 0, data: { "study-target": "timeMs" } %>
+        
+        <div class="flex space-x-2">
+          <button type="submit" 
+                  name="rating" 
+                  value="1"
+                  data-action="click->study#setRating"
+                  data-rating="1"
+                  class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors">
+            Again (1)
+          </button>
+          <button type="submit" 
+                  name="rating" 
+                  value="2"
+                  data-action="click->study#setRating"
+                  data-rating="2"
+                  class="px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 transition-colors">
+            Hard (2)
+          </button>
+          <button type="submit" 
+                  name="rating" 
+                  value="3"
+                  data-action="click->study#setRating"
+                  data-rating="3"
+                  class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors">
+            Good (3)
+          </button>
+          <button type="submit" 
+                  name="rating" 
+                  value="4"
+                  data-action="click->study#setRating"
+                  data-rating="4"
+                  class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+            Easy (4)
+          </button>
+        </div>
+      <% end %>
+    </div>
+
+    <%# Keyboard Shortcuts Hint %>
+    <div class="mt-8 text-center text-xs text-gray-500">
+      <p>Keyboard shortcuts: <kbd class="px-1 py-0.5 bg-gray-100 rounded">Space</kbd> to show answer, <kbd class="px-1 py-0.5 bg-gray-100 rounded">1-4</kbd> to rate</p>
+    </div>
+  </div>
+</div>

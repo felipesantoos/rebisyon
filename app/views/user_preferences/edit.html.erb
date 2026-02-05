@@ -1,0 +1,208 @@
+<% content_for :page_title, t("user_preferences.title") %>
+
+<div class="max-w-4xl space-y-6">
+  <div>
+    <h1 class="text-2xl font-semibold text-gray-900"><%= t("user_preferences.title") %></h1>
+    <p class="mt-1 text-sm text-gray-500">Customize your learning experience</p>
+  </div>
+
+  <%= form_with model: @user_preference, url: user_preferences_path, method: :patch, class: "space-y-6" do |f| %>
+    <%# Display Settings %>
+    <section class="card">
+      <h2 class="text-lg font-semibold text-gray-900 mb-6">Display</h2>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <%# Language %>
+        <div>
+          <%= f.label :language, class: "block text-sm font-medium text-gray-700 mb-2" %>
+          <%= f.select :language, 
+              [["English", "en"], ["Português (Brasil)", "pt-BR"]], 
+              {}, 
+              class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" %>
+        </div>
+
+        <%# Theme %>
+        <div>
+          <%= f.label :theme, class: "block text-sm font-medium text-gray-700 mb-2" %>
+          <%= f.select :theme, 
+              [["Auto", "auto"], ["Light", "light"], ["Dark", "dark"]], 
+              {}, 
+              class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" %>
+        </div>
+
+        <%# UI Size %>
+        <div>
+          <%= f.label :ui_size, class: "block text-sm font-medium text-gray-700 mb-2" %>
+          <%= f.number_field :ui_size, 
+              min: 0.5, max: 3.0, step: 0.1,
+              class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" %>
+          <p class="mt-1 text-xs text-gray-500">Scale factor (0.5 - 3.0)</p>
+        </div>
+      </div>
+
+      <div class="mt-6 space-y-4">
+        <label class="flex items-center gap-3 cursor-pointer">
+          <%= f.check_box :minimalist_mode, class: "w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500" %>
+          <span class="text-sm text-gray-700">Minimalist mode</span>
+        </label>
+
+        <label class="flex items-center gap-3 cursor-pointer">
+          <%= f.check_box :reduce_motion, class: "w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500" %>
+          <span class="text-sm text-gray-700">Reduce motion</span>
+        </label>
+      </div>
+    </section>
+
+    <%# Study Settings %>
+    <section class="card">
+      <h2 class="text-lg font-semibold text-gray-900 mb-6">Study</h2>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <%# Next day starts at %>
+        <div>
+          <%= f.label :next_day_starts_at, "Next day starts at", class: "block text-sm font-medium text-gray-700 mb-2" %>
+          <%= f.time_field :next_day_starts_at, 
+              class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" %>
+          <p class="mt-1 text-xs text-gray-500">When reviews reset for a new day</p>
+        </div>
+
+        <%# Learn ahead limit %>
+        <div>
+          <%= f.label :learn_ahead_limit, "Learn ahead limit (minutes)", class: "block text-sm font-medium text-gray-700 mb-2" %>
+          <%= f.number_field :learn_ahead_limit, 
+              min: 0, max: 120,
+              class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" %>
+        </div>
+
+        <%# Timebox limit %>
+        <div>
+          <%= f.label :timebox_time_limit, "Timebox limit (minutes)", class: "block text-sm font-medium text-gray-700 mb-2" %>
+          <%= f.number_field :timebox_time_limit, 
+              min: 0, max: 120,
+              class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" %>
+          <p class="mt-1 text-xs text-gray-500">0 to disable</p>
+        </div>
+      </div>
+
+      <div class="mt-6 space-y-4">
+        <label class="flex items-center gap-3 cursor-pointer">
+          <%= f.check_box :show_remaining_count, class: "w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500" %>
+          <span class="text-sm text-gray-700">Show remaining card count</span>
+        </label>
+
+        <label class="flex items-center gap-3 cursor-pointer">
+          <%= f.check_box :show_next_review_time, class: "w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500" %>
+          <span class="text-sm text-gray-700">Show next review time on buttons</span>
+        </label>
+
+        <label class="flex items-center gap-3 cursor-pointer">
+          <%= f.check_box :spacebar_answers_card, class: "w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500" %>
+          <span class="text-sm text-gray-700">Spacebar answers card</span>
+        </label>
+      </div>
+    </section>
+
+    <%# Audio/Video Settings %>
+    <section class="card">
+      <h2 class="text-lg font-semibold text-gray-900 mb-6">Audio & Video</h2>
+      
+      <div class="space-y-4">
+        <label class="flex items-center gap-3 cursor-pointer">
+          <%= f.check_box :show_play_buttons, class: "w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500" %>
+          <span class="text-sm text-gray-700">Show play buttons</span>
+        </label>
+
+        <label class="flex items-center gap-3 cursor-pointer">
+          <%= f.check_box :interrupt_audio_on_answer, class: "w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500" %>
+          <span class="text-sm text-gray-700">Interrupt audio when showing answer</span>
+        </label>
+      </div>
+    </section>
+
+    <%# Editing Settings %>
+    <section class="card">
+      <h2 class="text-lg font-semibold text-gray-900 mb-6">Editing</h2>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <div>
+          <%= f.label :default_deck_behavior, "Default deck", class: "block text-sm font-medium text-gray-700 mb-2" %>
+          <%= f.select :default_deck_behavior, 
+              [["Current deck", "current_deck"], ["Last deck used to add", "last_deck_used_to_add"], ["First field", "first_field"]], 
+              {}, 
+              class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" %>
+        </div>
+      </div>
+
+      <div class="space-y-4">
+        <label class="flex items-center gap-3 cursor-pointer">
+          <%= f.check_box :paste_strips_formatting, class: "w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500" %>
+          <span class="text-sm text-gray-700">Paste strips formatting</span>
+        </label>
+
+        <label class="flex items-center gap-3 cursor-pointer">
+          <%= f.check_box :paste_images_as_png, class: "w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500" %>
+          <span class="text-sm text-gray-700">Paste images as PNG</span>
+        </label>
+      </div>
+    </section>
+
+    <%# Search Settings %>
+    <section class="card">
+      <h2 class="text-lg font-semibold text-gray-900 mb-6">Search</h2>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <div>
+          <%= f.label :default_search_text, "Default search", class: "block text-sm font-medium text-gray-700 mb-2" %>
+          <%= f.text_field :default_search_text, 
+              placeholder: "e.g., deck:current",
+              class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500" %>
+        </div>
+      </div>
+
+      <div class="space-y-4">
+        <label class="flex items-center gap-3 cursor-pointer">
+          <%= f.check_box :ignore_accents_in_search, class: "w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500" %>
+          <span class="text-sm text-gray-700">Ignore accents in search</span>
+        </label>
+      </div>
+    </section>
+
+    <%# Sync Settings %>
+    <section class="card">
+      <h2 class="text-lg font-semibold text-gray-900 mb-6">Synchronization</h2>
+      
+      <div class="space-y-4">
+        <label class="flex items-center gap-3 cursor-pointer">
+          <%= f.check_box :auto_sync, class: "w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500" %>
+          <span class="text-sm text-gray-700">Auto sync on open/close</span>
+        </label>
+
+        <label class="flex items-center gap-3 cursor-pointer">
+          <%= f.check_box :sync_audio_and_images, class: "w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500" %>
+          <span class="text-sm text-gray-700">Sync audio and images</span>
+        </label>
+
+        <label class="flex items-center gap-3 cursor-pointer">
+          <%= f.check_box :periodically_sync_media, class: "w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500" %>
+          <span class="text-sm text-gray-700">Periodically sync media</span>
+        </label>
+      </div>
+
+      <div class="mt-6 pt-6 border-t border-gray-200">
+        <div>
+          <%= f.label :self_hosted_sync_server_url, "Self-hosted sync server URL", class: "block text-sm font-medium text-gray-700 mb-2" %>
+          <%= f.text_field :self_hosted_sync_server_url, 
+              placeholder: "https://your-server.com/sync",
+              class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500" %>
+          <p class="mt-1 text-xs text-gray-500">Leave empty to use the default server</p>
+        </div>
+      </div>
+    </section>
+
+    <%# Submit button %>
+    <div class="flex justify-end gap-4">
+      <%= link_to "Cancel", dashboard_path, class: "btn-secondary" %>
+      <%= f.submit "Save preferences", class: "btn-primary" %>
+    </div>
+  <% end %>
+</div>

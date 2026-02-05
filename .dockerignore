@@ -1,0 +1,64 @@
+# Git
+.git
+.gitignore
+
+# Docker
+.dockerignore
+docker-compose*.yml
+Dockerfile*
+
+# Editor/IDE
+.idea
+.vscode
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+log/*
+!log/.keep
+
+# Temp files
+tmp/*
+!tmp/.keep
+!tmp/pids
+!tmp/pids/.keep
+
+# Storage (will be mounted as volume)
+storage/*
+!storage/.keep
+
+# Coverage reports
+coverage/
+
+# Test artifacts
+spec/examples.txt
+
+# Node modules (if any)
+node_modules/
+
+# Bundler
+.bundle
+vendor/bundle
+
+# Environment files
+.env*
+!.env.example
+
+# Credentials (sensitive)
+config/master.key
+config/credentials/*.key
+
+# Documentation
+*.md
+!README.md
+docs/
+
+# Misc
+.ruby-version
+.ruby-gemset
+.rvmrc

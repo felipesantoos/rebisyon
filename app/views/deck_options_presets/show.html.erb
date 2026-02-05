@@ -1,0 +1,24 @@
+<% content_for :title, @preset.name %>
+<% content_for :page_title, @preset.name %>
+
+<div class="space-y-6">
+  <%# Actions %>
+  <div class="flex items-center space-x-4">
+    <%= link_to "Edit this preset", edit_deck_options_preset_path(@preset), class: "btn-secondary" %>
+    <%= link_to "Back to presets", deck_options_presets_path, class: "text-gray-600 hover:text-gray-900" %>
+    <%= button_to "Destroy this preset", deck_options_preset_path(@preset), method: :delete, 
+        class: "btn-danger", 
+        data: { confirm: "Are you sure?" } %>
+  </div>
+
+  <%# Preset Details %>
+  <div class="card">
+    <h2 class="text-xl font-semibold text-gray-900 mb-4">Preset Details</h2>
+    <dl class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div>
+        <dt class="text-sm font-medium text-gray-500">Name</dt>
+        <dd class="mt-1 text-sm text-gray-900"><%= @preset.name %></dd>
+      </div>
+    </dl>
+  </div>
+</div>

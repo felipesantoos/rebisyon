@@ -1,0 +1,62 @@
+# PostgreSQL 16+ Configuration
+# Supports both local development and Docker environments
+
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+  # Timeout settings
+  connect_timeout: 5
+  checkout_timeout: 5
+
+# Development: supports local socket or Docker TCP connection
+development:
+  <<: *default
+  database: <%= ENV.fetch("POSTGRES_DB") { "rebisyon_development" } %>
+  # Use DATABASE_URL if provided (e.g., from Docker), otherwise local socket
+  <% if ENV["DATABASE_URL"] %>
+  url: <%= ENV["DATABASE_URL"] %>
+  <% else %>
+  host: <%= ENV.fetch("POSTGRES_HOST") { "localhost" } %>
+  port: <%= ENV.fetch("POSTGRES_PORT") { 5432 } %>
+  username: <%= ENV.fetch("POSTGRES_USER") { nil } %>
+  password: <%= ENV.fetch("POSTGRES_PASSWORD") { nil } %>
+  <% end %>
+
+# Test database
+test:
+  <<: *default
+  database: <%= ENV.fetch("POSTGRES_DB") { "rebisyon_test" } %>
+  <% if ENV["DATABASE_URL"] %>
+  url: <%= ENV["DATABASE_URL"].sub("_development", "_test") %>
+  <% else %>
+  host: <%= ENV.fetch("POSTGRES_HOST") { "localhost" } %>
+  port: <%= ENV.fetch("POSTGRES_PORT") { 5432 } %>
+  username: <%= ENV.fetch("POSTGRES_USER") { nil } %>
+  password: <%= ENV.fetch("POSTGRES_PASSWORD") { nil } %>
+  <% end %>
+
+# Production uses DATABASE_URL from environment
+production:
+  <<: *default
+  url: <%= ENV["DATABASE_URL"] %>
+  # Fallback to individual settings if DATABASE_URL not provided
+  database: <%= ENV.fetch("POSTGRES_DB") { "rebisyon_production" } %>
+  username: <%= ENV.fetch("POSTGRES_USER") { "rebisyon" } %>
+  password: <%= ENV["POSTGRES_PASSWORD"] %>
+  host: <%= ENV.fetch("POSTGRES_HOST") { "localhost" } %>
+  port: <%= ENV.fetch("POSTGRES_PORT") { 5432 } %>
+
+# Solid Cable database connection (can use same database or separate)
+# For production, Solid Cable can use the same database or a separate one for better isolation
+cable:
+  <<: *default
+  database: <%= ENV.fetch("CABLE_DATABASE") { ENV.fetch("POSTGRES_DB") { "rebisyon_production" } } %>
+  <% if ENV["CABLE_DATABASE_URL"] %>
+  url: <%= ENV["CABLE_DATABASE_URL"] %>
+  <% else %>
+  host: <%= ENV.fetch("POSTGRES_HOST") { "localhost" } %>
+  port: <%= ENV.fetch("POSTGRES_PORT") { 5432 } %>
+  username: <%= ENV.fetch("POSTGRES_USER") { "rebisyon" } %>
+  password: <%= ENV["POSTGRES_PASSWORD"] %>
+  <% end %>

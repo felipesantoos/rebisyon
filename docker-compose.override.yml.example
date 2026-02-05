@@ -1,0 +1,16 @@
+# Docker Compose Override for Development
+# Copy this file to docker-compose.override.yml to customize local development
+
+services:
+  postgres:
+    # Uncomment to expose different port
+    # ports:
+    #   - "5433:5432"
+
+  # Development Rails server with live reloading
+  web:
+    profiles: []  # Remove profile to always start
+    environment:
+      RAILS_ENV: development
+      DATABASE_URL: postgres://rebisyon:rebisyon@postgres:5432/rebisyon_development
+    command: bin/rails server -b 0.0.0.0 -p 3000

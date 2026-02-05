@@ -1,0 +1,69 @@
+pt-BR:
+  errors:
+    not_authorized: "Você não está autorizado a realizar esta ação"
+    record_not_found: "O registro solicitado não foi encontrado"
+  
+  flash:
+    create_success: "%{resource} foi criado(a) com sucesso"
+    update_success: "%{resource} foi atualizado(a) com sucesso"
+    delete_success: "%{resource} foi excluído(a) com sucesso"
+    
+  dashboard:
+    title: "Painel"
+    welcome: "Bem-vindo de volta!"
+    subtitle: "Pronto para estudar? Aqui está seu resumo diário."
+    study_now: "Estudar Agora"
+    due_today: "Pendentes Hoje"
+    cards_to_review: "cards para revisar"
+    new_cards: "Cards Novos"
+    ready_to_learn: "prontos para aprender"
+    learning: "Aprendendo"
+    in_progress: "em progresso"
+    your_decks: "Seus Baralhos"
+    create_deck: "+ Criar Baralho"
+    no_decks_title: "Nenhum baralho ainda"
+    no_decks_description: "Crie seu primeiro baralho para começar a adicionar flashcards e estudar com repetição espaçada."
+    create_first_deck: "Crie seu primeiro baralho"
+    getting_started: "Primeiros Passos"
+    step_1_title: "Crie um baralho"
+    step_1_description: "Organize seus cards em baralhos por tema"
+    step_2_title: "Adicione notas"
+    step_2_description: "Crie flashcards com perguntas e respostas"
+    step_3_title: "Estude diariamente"
+    step_3_description: "Revise cards quando estiverem pendentes para retenção ideal"
+    
+  navigation:
+    study: "Estudo"
+    manage: "Gerenciar"
+    analytics: "Análises"
+    dashboard: "Painel"
+    decks: "Baralhos"
+    browse: "Navegar"
+    note_types: "Tipos de Nota"
+    statistics: "Estatísticas"
+    preferences: "Preferências"
+    account: "Conta"
+    sign_out: "Sair"
+    add_note: "Adicionar Nota"
+    
+  user_preferences:
+    title: "Preferências"
+    
+  activerecord:
+    models:
+      user: "Usuário"
+      deck: "Baralho"
+      note: "Nota"
+      card: "Card"
+      note_type: "Tipo de Nota"
+      user_preference: "Preferência do Usuário"
+    attributes:
+      user:
+        email: "E-mail"
+        password: "Senha"
+        password_confirmation: "Confirmação de senha"
+        remember_me: "Lembrar de mim"
+      user_preference:
+        language: "Idioma"
+        theme: "Tema"
+        ui_size: "Tamanho da Interface"

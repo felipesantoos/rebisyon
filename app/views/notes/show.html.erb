@@ -1,0 +1,123 @@
+<% content_for :title, "Note" %>
+<% content_for :page_title, "Note" %>
+
+<div class="max-w-4xl">
+  <div class="mb-6 flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-semibold text-gray-900">Note</h1>
+      <p class="mt-1 text-sm text-gray-500">View note details and related cards</p>
+    </div>
+    <div class="flex items-center space-x-2">
+      <%= link_to "Edit", edit_note_path(@note), class: "btn-primary" %>
+      <%= link_to "Back", notes_path, class: "btn-secondary" %>
+    </div>
+  </div>
+
+  <div class="space-y-6">
+    <div class="card">
+      <div class="mb-4">
+        <h2 class="text-lg font-semibold text-gray-900 mb-4">Note Information</h2>
+        
+        <div class="grid grid-cols-2 gap-4 mb-4">
+          <div>
+            <span class="text-sm font-medium text-gray-500">Note Type:</span>
+            <p class="text-sm text-gray-900"><%= @note.note_type.name %></p>
+          </div>
+          <div>
+            <span class="text-sm font-medium text-gray-500">GUID:</span>
+            <p class="text-sm text-gray-900 font-mono"><%= @note.guid %></p>
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <span class="text-sm font-medium text-gray-500">Fields:</span>
+          <div class="mt-2 space-y-2">
+            <% if @note.note_type %>
+              <% @note.note_type.field_names.each do |field_name| %>
+                <div>
+                  <span class="text-sm font-medium text-gray-700"><%= field_name %>:</span>
+                  <div class="mt-1 p-3 bg-gray-50 rounded-md text-sm text-gray-900 whitespace-pre-wrap">
+                    <%= simple_format(@note.fields_json[field_name.to_s] || "") %>
+                  </div>
+                </div>
+              <% end %>
+            <% end %>
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <span class="text-sm font-medium text-gray-500">Tags:</span>
+          <div class="mt-1 flex flex-wrap gap-2">
+            <% @note.tags.each do |tag| %>
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                <%= tag %>
+              </span>
+            <% end %>
+          </div>
+        </div>
+
+        <div class="flex items-center space-x-4">
+          <% if @note.marked? %>
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+              Marked
+            </span>
+          <% end %>
+          <span class="text-sm text-gray-500">
+            Created: <%= @note.created_at.strftime("%B %d, %Y at %I:%M %p") %>
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 class="text-lg font-semibold text-gray-900 mb-4">Related Cards</h2>
+      <% if @cards.any? %>
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Card Type</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Deck</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">State</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Due</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Interval</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              <% @cards.each do |card| %>
+                <tr>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <%= card.card_type_id %>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <%= card.deck.name %>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm">
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                      <%= case card.state
+                          when 'new' then 'bg-gray-100 text-gray-800'
+                          when 'learn' then 'bg-blue-100 text-blue-800'
+                          when 'review' then 'bg-green-100 text-green-800'
+                          when 'relearn' then 'bg-yellow-100 text-yellow-800'
+                          else 'bg-gray-100 text-gray-800'
+                          end %>">
+                      <%= card.state %>
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <%= card.due %>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <%= card.interval %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      <% else %>
+        <p class="text-sm text-gray-500">No cards generated for this note yet.</p>
+      <% end %>
+    </div>
+  </div>
+</div>

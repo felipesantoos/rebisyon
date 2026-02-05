@@ -1,0 +1,17 @@
+<% content_for :title, "New note type" %>
+<% content_for :page_title, "New Note Type" %>
+
+<div class="space-y-6">
+  <div>
+    <h1 class="text-2xl font-semibold text-gray-900">New note type</h1>
+    <p class="mt-1 text-sm text-gray-500">Create a new note type to define the structure of your notes.</p>
+  </div>
+
+  <div class="card">
+    <%= render "form", note_type: @note_type %>
+  </div>
+
+  <div>
+    <%= link_to "Back to note types", note_types_path, class: "text-gray-600 hover:text-gray-900" %>
+  </div>
+</div>

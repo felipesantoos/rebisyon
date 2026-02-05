@@ -1,0 +1,27 @@
+<% content_for :title, "Deck options presets" %>
+<% content_for :page_title, "Deck Options Presets" %>
+
+<div class="space-y-6">
+  <div class="flex items-center justify-between">
+    <h1 class="text-2xl font-semibold text-gray-900">Deck Options Presets</h1>
+    <%= link_to "New preset", new_deck_options_preset_path, class: "btn-primary" %>
+  </div>
+
+  <div class="card">
+    <% if @presets.empty? %>
+      <div class="text-center py-12">
+        <p class="text-gray-500 mb-4">No presets yet. Create your first preset to get started.</p>
+        <%= link_to "Create your first preset", new_deck_options_preset_path, class: "btn-primary inline-block" %>
+      </div>
+    <% else %>
+      <div class="space-y-2">
+        <% @presets.each do |preset| %>
+          <div class="flex items-center justify-between p-4 bg-gray-50 rounded-md hover:bg-gray-100 transition-colors">
+            <span class="text-lg font-medium text-gray-900"><%= preset.name %></span>
+            <%= link_to "View", deck_options_preset_path(preset), class: "text-blue-600 hover:text-blue-700 font-medium" %>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+</div>

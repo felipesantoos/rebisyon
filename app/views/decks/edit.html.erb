@@ -1,0 +1,19 @@
+<% content_for :title, "Editing deck" %>
+<% content_for :page_title, "Edit Deck" %>
+
+<div class="space-y-6">
+  <div>
+    <h1 class="text-2xl font-semibold text-gray-900">Editing deck</h1>
+    <p class="mt-1 text-sm text-gray-500">Update your deck information.</p>
+  </div>
+
+  <div class="card">
+    <%= render "form", deck: @deck %>
+  </div>
+
+  <div class="flex items-center space-x-4">
+    <%= link_to "Show this deck", @deck, class: "text-blue-600 hover:text-blue-700" %>
+    <span class="text-gray-400">|</span>
+    <%= link_to "Back to decks", decks_path, class: "text-gray-600 hover:text-gray-900" %>
+  </div>
+</div>

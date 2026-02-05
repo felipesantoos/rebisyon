@@ -1,0 +1,51 @@
+<% content_for :title, @deck.name %>
+<% content_for :page_title, @deck.name %>
+
+<div class="space-y-6">
+  <%# Actions %>
+  <div class="flex items-center space-x-4">
+    <%= link_to "Edit this deck", edit_deck_path(@deck), class: "btn-secondary" %>
+    <%= link_to "Back to decks", decks_path, class: "text-gray-600 hover:text-gray-900" %>
+    <%= button_to "Destroy this deck", deck_path(@deck), method: :delete, 
+        class: "btn-danger", 
+        data: { confirm: "Are you sure?" } %>
+  </div>
+
+  <%# Deck Details %>
+  <div class="card">
+    <h2 class="text-xl font-semibold text-gray-900 mb-4">Deck Details</h2>
+    <dl class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div>
+        <dt class="text-sm font-medium text-gray-500">Name</dt>
+        <dd class="mt-1 text-sm text-gray-900"><%= @deck.name %></dd>
+      </div>
+      <div>
+        <dt class="text-sm font-medium text-gray-500">Full Name</dt>
+        <dd class="mt-1 text-sm text-gray-900"><%= @deck.full_name %></dd>
+      </div>
+      <% if @deck.parent %>
+        <div>
+          <dt class="text-sm font-medium text-gray-500">Parent</dt>
+          <dd class="mt-1 text-sm text-gray-900">
+            <%= link_to @deck.parent.name, deck_path(@deck.parent), class: "text-blue-600 hover:text-blue-700" %>
+          </dd>
+        </div>
+      <% end %>
+    </dl>
+  </div>
+
+  <%# Children Decks %>
+  <% unless @deck.children.empty? %>
+    <div class="card">
+      <h2 class="text-xl font-semibold text-gray-900 mb-4">Child Decks</h2>
+      <div class="space-y-2">
+        <% @deck.children.each do |child| %>
+          <div class="flex items-center justify-between p-3 bg-gray-50 rounded-md">
+            <span class="text-gray-900"><%= child.name %></span>
+            <%= link_to "View", deck_path(child), class: "text-blue-600 hover:text-blue-700 text-sm font-medium" %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+</div>

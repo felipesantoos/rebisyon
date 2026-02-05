@@ -1,0 +1,61 @@
+<% if @next_card %>
+  <%# Show next card %>
+  <% renderer = Cards::TemplateRenderer.new(@next_card) %>
+  <%= turbo_stream.replace "card-display" do %>
+    <div id="card-display" class="card min-h-[400px] flex flex-col">
+      <div id="card-front" class="flex-1 flex items-center justify-center p-8">
+        <div class="prose max-w-none text-center">
+          <%= raw renderer.render_front %>
+        </div>
+      </div>
+      
+      <div id="card-back" class="hidden flex-1 flex items-center justify-center p-8">
+        <div class="prose max-w-none text-center">
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <%= turbo_stream.replace "answer-buttons" do %>
+    <div id="answer-buttons" class="mt-6 flex justify-center space-x-4">
+      <button type="button" 
+              data-action="click->study#showAnswer"
+              data-study-target="showAnswerBtn"
+              data-study-card-id-value="<%= @next_card.id %>"
+              class="btn-primary">
+        Show Answer
+      </button>
+    </div>
+  <% end %>
+
+  <%= turbo_stream.replace "rating-buttons" do %>
+    <div id="rating-buttons" class="hidden mt-6 flex justify-center space-x-4" data-study-target="ratingButtons">
+      <%= form_with url: answer_deck_study_path(@deck), method: :post, 
+          data: { "study-target": "answerForm", "action": "submit->study#submitAnswer" } do |form| %>
+        <%= form.hidden_field :card_id, value: @next_card.id, data: { "study-target": "cardId" } %>
+        <%= form.hidden_field :time_ms, value: 0, data: { "study-target": "timeMs" } %>
+        
+        <div class="flex space-x-2">
+          <button type="submit" name="rating" value="1" data-action="click->study#setRating" data-rating="1" class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors">Again (1)</button>
+          <button type="submit" name="rating" value="2" data-action="click->study#setRating" data-rating="2" class="px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 transition-colors">Hard (2)</button>
+          <button type="submit" name="rating" value="3" data-action="click->study#setRating" data-rating="3" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors">Good (3)</button>
+          <button type="submit" name="rating" value="4" data-action="click->study#setRating" data-rating="4" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">Easy (4)</button>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+
+  <%= turbo_stream.update "session-stats" do %>
+    <div class="mb-4 flex items-center justify-between text-sm text-gray-600">
+      <div>
+        <span class="font-medium">Cards studied:</span> <%= @session_stats[:cards_studied] %>
+      </div>
+      <div>
+        <%= link_to "Finish", deck_path(@deck), class: "text-blue-600 hover:text-blue-700" %>
+      </div>
+    </div>
+  <% end %>
+<% else %>
+  <%# No more cards - redirect to deck %>
+  <%= turbo_stream.redirect deck_path(@deck) %>
+<% end %>
