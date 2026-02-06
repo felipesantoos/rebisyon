@@ -26,10 +26,8 @@ module Users
         end
       else
         # Render the sign in form (for new action or failed sign in)
-        respond_to do |format|
-          format.html { render :new }
-          format.turbo_stream { render :new }
-        end
+        # Use :unprocessable_entity so Turbo replaces the page content
+        render :new, status: :unprocessable_entity
       end
     end
 
