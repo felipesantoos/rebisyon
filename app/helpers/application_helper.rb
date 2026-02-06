@@ -1,4 +1,5 @@
 module ApplicationHelper
+  include MockDataHelper
   # Generates a sortable column header link
   # @param name [String] Display name for the column
   # @param column [String] Database column to sort by

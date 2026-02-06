@@ -1,0 +1,29 @@
+<%# Tag chip editor with autocomplete %>
+<%# Usage: render "shared/tag_editor", tags: ["verb", "jlpt-n5"], field_name: "note[tags]" %>
+<% tags = local_assigns[:tags] || [] %>
+<% field_name = local_assigns[:field_name] || "tags" %>
+<% all_tags = local_assigns[:all_tags] || mock_all_tags %>
+
+<div data-controller="tag-input" data-tag-input-suggestions-value="<%= all_tags.to_json %>">
+  <div class="flex flex-wrap items-center gap-1.5 px-3 py-2 border border-gray-300 rounded-md bg-white focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 min-h-[38px]"
+       data-tag-input-target="container"
+       data-action="click->tag-input#focusInput">
+    <% tags.each do |tag| %>
+      <span class="tag-chip" data-tag-input-target="chip">
+        <%= tag %>
+        <button type="button" data-action="click->tag-input#removeTag" class="ml-1 text-gray-400 hover:text-gray-600">&times;</button>
+        <input type="hidden" name="<%= field_name %>[]" value="<%= tag %>">
+      </span>
+    <% end %>
+    <input type="text"
+           data-tag-input-target="input"
+           data-action="keydown->tag-input#handleKeydown input->tag-input#handleInput"
+           placeholder="<%= tags.empty? ? 'Add tags...' : '' %>"
+           class="flex-1 min-w-[120px] outline-none text-sm bg-transparent border-none p-0 focus:ring-0"
+           autocomplete="off">
+  </div>
+
+  <%# Autocomplete dropdown %>
+  <div data-tag-input-target="suggestions" class="hidden absolute z-10 mt-1 w-full max-h-40 overflow-y-auto bg-white border border-gray-200 rounded-md shadow-lg">
+  </div>
+</div>

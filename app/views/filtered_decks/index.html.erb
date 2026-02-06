@@ -1,0 +1,46 @@
+<% content_for :title, "Filtered Decks" %>
+<% content_for :page_title, "Filtered Decks" %>
+<% content_for :page_actions do %>
+  <%= link_to new_filtered_deck_path, class: "btn-primary inline-flex items-center gap-1.5" do %>
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+    </svg>
+    Create Filtered Deck
+  <% end %>
+<% end %>
+
+<div class="max-w-4xl mx-auto space-y-4">
+  <p class="text-sm text-gray-600">
+    Filtered decks pull cards from other decks based on search criteria.
+  </p>
+
+  <div class="space-y-4">
+    <% @filtered_decks.each do |fd| %>
+      <div class="card">
+        <div class="flex items-start justify-between">
+          <div class="flex-1">
+            <div class="flex items-center gap-3 mb-2">
+              <%= link_to fd[:name], filtered_deck_path(fd[:id]), class: "font-semibold text-gray-900 hover:text-blue-600" %>
+            </div>
+            <div class="mb-2">
+              <span class="bg-gray-100 px-2 py-1 rounded font-mono text-sm text-gray-700"><%= fd[:search_filter] %></span>
+            </div>
+            <div class="flex items-center gap-4 text-sm text-gray-500">
+              <span><%= fd[:card_count] %> cards</span>
+              <span>Order: <%= fd[:order] %></span>
+              <span>Last rebuild: <%= fd[:last_rebuild] %></span>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 ml-4">
+            <%= link_to "Study", "#", class: "btn-primary text-sm px-3 py-1" %>
+            <%= link_to "Rebuild", "#", class: "btn-secondary text-sm px-3 py-1" %>
+            <%= link_to "Edit", edit_filtered_deck_path(fd[:id]), class: "text-sm text-blue-600 hover:text-blue-700" %>
+            <%= button_to "Delete", filtered_deck_path(fd[:id]), method: :delete,
+                class: "btn-danger text-sm px-3 py-1",
+                data: { turbo_confirm: "Are you sure you want to delete this filtered deck?" } %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>

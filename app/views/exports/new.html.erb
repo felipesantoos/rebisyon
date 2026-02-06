@@ -1,0 +1,72 @@
+<% content_for :title, "Export" %>
+<% content_for :page_title, "Export" %>
+
+<div class="max-w-2xl mx-auto space-y-6">
+  <div class="card">
+    <h2 class="text-lg font-semibold text-gray-900 mb-4">Export</h2>
+    <div class="space-y-4">
+      <%# Scope %>
+      <div>
+        <label class="form-label">Scope</label>
+        <select class="form-select">
+          <option>All decks</option>
+          <option>Japanese</option>
+          <option>Japanese::Vocabulary</option>
+          <option>Japanese::Kanji</option>
+          <option>Spanish</option>
+          <option>Default</option>
+        </select>
+      </div>
+
+      <%# Format %>
+      <div>
+        <label class="form-label">Format</label>
+        <div class="space-y-2">
+          <label class="flex items-center gap-3 cursor-pointer">
+            <input type="radio" name="format" value="apkg" checked class="w-4 h-4 text-blue-600 border-gray-300">
+            <div>
+              <span class="text-sm text-gray-700 font-medium">Anki Deck Package (.apkg)</span>
+              <p class="text-xs text-gray-500">Includes scheduling data. Best for backup or sharing.</p>
+            </div>
+          </label>
+          <label class="flex items-center gap-3 cursor-pointer">
+            <input type="radio" name="format" value="colpkg" class="w-4 h-4 text-blue-600 border-gray-300">
+            <div>
+              <span class="text-sm text-gray-700 font-medium">Anki Collection Package (.colpkg)</span>
+              <p class="text-xs text-gray-500">Full collection backup. Replaces entire collection on import.</p>
+            </div>
+          </label>
+          <label class="flex items-center gap-3 cursor-pointer">
+            <input type="radio" name="format" value="csv" class="w-4 h-4 text-blue-600 border-gray-300">
+            <div>
+              <span class="text-sm text-gray-700 font-medium">Notes in Plain Text (.csv)</span>
+              <p class="text-xs text-gray-500">Card content only. No scheduling data or media.</p>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <%# Options %>
+      <div class="space-y-3 pt-2">
+        <label class="flex items-center gap-3 cursor-pointer">
+          <input type="checkbox" checked class="w-4 h-4 text-blue-600 border-gray-300 rounded">
+          <span class="text-sm text-gray-700">Include scheduling information</span>
+        </label>
+        <label class="flex items-center gap-3 cursor-pointer">
+          <input type="checkbox" checked class="w-4 h-4 text-blue-600 border-gray-300 rounded">
+          <span class="text-sm text-gray-700">Include media</span>
+        </label>
+        <label class="flex items-center gap-3 cursor-pointer">
+          <input type="checkbox" class="w-4 h-4 text-blue-600 border-gray-300 rounded">
+          <span class="text-sm text-gray-700">Include tags</span>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <%# Actions %>
+  <div class="flex items-center justify-between">
+    <%= link_to "Cancel", root_path, class: "btn-secondary" %>
+    <button class="btn-primary">Export</button>
+  </div>
+</div>

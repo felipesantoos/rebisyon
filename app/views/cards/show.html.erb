@@ -1,59 +1,119 @@
-<% content_for :title, "Card ##{@card.id}" %>
-<% content_for :page_title, "Card Details" %>
+<% content_for :title, "Card Info" %>
+<% content_for :page_title, "Card Info" %>
+<% mock = mock_card_info %>
 
-<div class="space-y-6">
-  <div class="flex items-center space-x-4">
-    <%= link_to "Edit", edit_card_path(@card), class: "btn-secondary" %>
-    <%= link_to "Back to notes", notes_path, class: "text-gray-600 hover:text-gray-900" %>
+<div class="max-w-4xl mx-auto space-y-6">
+  <%# Card preview (front/back) %>
+  <div class="grid grid-cols-2 gap-4">
+    <div class="card">
+      <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Front</h3>
+      <div class="border border-gray-200 rounded-md p-6 min-h-[120px] bg-gray-50 flex items-center justify-center">
+        <div class="prose max-w-none text-center">
+          <%= raw mock[:front_html] %>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Back</h3>
+      <div class="border border-gray-200 rounded-md p-6 min-h-[120px] bg-gray-50 flex items-center justify-center">
+        <div class="prose max-w-none text-center">
+          <%= raw mock[:back_html] %>
+        </div>
+      </div>
+    </div>
   </div>
 
+  <%# Stats grid %>
   <div class="card">
-    <h2 class="text-xl font-semibold text-gray-900 mb-4">Card Details</h2>
-    <dl class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-      <div>
-        <dt class="text-sm font-medium text-gray-500">Note</dt>
-        <dd class="mt-1 text-sm text-gray-900">
-          <%= link_to @note.first_field.to_s.truncate(50), note_path(@note), class: "text-blue-600 hover:text-blue-700" %>
-        </dd>
-      </div>
-      <div>
-        <dt class="text-sm font-medium text-gray-500">Deck</dt>
-        <dd class="mt-1 text-sm text-gray-900">
-          <%= link_to @deck.full_name, deck_path(@deck), class: "text-blue-600 hover:text-blue-700" %>
-        </dd>
-      </div>
-      <div>
-        <dt class="text-sm font-medium text-gray-500">State</dt>
-        <dd class="mt-1 text-sm text-gray-900"><%= @card.state %></dd>
-      </div>
-      <div>
-        <dt class="text-sm font-medium text-gray-500">Interval</dt>
-        <dd class="mt-1 text-sm text-gray-900"><%= @card.interval %> days</dd>
-      </div>
-      <div>
-        <dt class="text-sm font-medium text-gray-500">Ease</dt>
-        <dd class="mt-1 text-sm text-gray-900"><%= @card.ease / 10.0 %>%</dd>
-      </div>
-      <div>
-        <dt class="text-sm font-medium text-gray-500">Reviews</dt>
-        <dd class="mt-1 text-sm text-gray-900"><%= @card.reps %></dd>
-      </div>
-      <div>
-        <dt class="text-sm font-medium text-gray-500">Lapses</dt>
-        <dd class="mt-1 text-sm text-gray-900"><%= @card.lapses %></dd>
-      </div>
-      <div>
-        <dt class="text-sm font-medium text-gray-500">Flag</dt>
-        <dd class="mt-1 text-sm text-gray-900"><%= @card.flag %></dd>
-      </div>
-      <div>
-        <dt class="text-sm font-medium text-gray-500">Suspended</dt>
-        <dd class="mt-1 text-sm text-gray-900"><%= @card.suspended? ? "Yes" : "No" %></dd>
-      </div>
-      <div>
-        <dt class="text-sm font-medium text-gray-500">Buried</dt>
-        <dd class="mt-1 text-sm text-gray-900"><%= @card.buried? ? "Yes" : "No" %></dd>
-      </div>
-    </dl>
+    <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-4">Card Statistics</h3>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <% [
+        ["Position", mock[:stats][:position]],
+        ["Due", mock[:stats][:due]],
+        ["Interval", mock[:stats][:interval]],
+        ["Ease", mock[:stats][:ease]],
+        ["Reviews", mock[:stats][:reviews]],
+        ["Lapses", mock[:stats][:lapses]],
+        ["Average Time", mock[:stats][:average_time]],
+        ["Total Time", mock[:stats][:total_time]],
+        ["Card Type", mock[:stats][:card_type]],
+        ["Created", mock[:stats][:created]],
+        ["Stability", mock[:stats][:stability]],
+        ["Difficulty", mock[:stats][:difficulty]],
+        ["Retrievability", mock[:stats][:retrievability]]
+      ].each do |label, value| %>
+        <div class="p-3 bg-gray-50 rounded-md">
+          <dt class="text-xs text-gray-500"><%= label %></dt>
+          <dd class="text-sm font-medium text-gray-900 mt-0.5"><%= value %></dd>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <%# Tags %>
+  <div class="card">
+    <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Tags</h3>
+    <div class="flex flex-wrap gap-2">
+      <% mock[:tags].each do |tag| %>
+        <span class="tag-chip"><%= tag %></span>
+      <% end %>
+    </div>
+  </div>
+
+  <%# Review history table %>
+  <div class="card">
+    <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-4">Review History</h3>
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="border-b border-gray-200">
+            <th class="text-left py-2 px-3 text-xs font-medium text-gray-500 uppercase">Date</th>
+            <th class="text-left py-2 px-3 text-xs font-medium text-gray-500 uppercase">Type</th>
+            <th class="text-left py-2 px-3 text-xs font-medium text-gray-500 uppercase">Rating</th>
+            <th class="text-left py-2 px-3 text-xs font-medium text-gray-500 uppercase">Interval</th>
+            <th class="text-left py-2 px-3 text-xs font-medium text-gray-500 uppercase">Ease</th>
+            <th class="text-left py-2 px-3 text-xs font-medium text-gray-500 uppercase">Time</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% mock[:reviews].each do |review| %>
+            <tr class="border-b border-gray-100 hover:bg-gray-50">
+              <td class="py-2 px-3 text-gray-600"><%= review[:date] %></td>
+              <td class="py-2 px-3">
+                <span class="text-xs font-medium px-2 py-0.5 rounded-full
+                  <%= case review[:type]
+                      when 'Learn' then 'bg-blue-100 text-blue-700'
+                      when 'Review' then 'bg-green-100 text-green-700'
+                      when 'Relearn' then 'bg-orange-100 text-orange-700'
+                      else 'bg-gray-100 text-gray-700'
+                      end %>">
+                  <%= review[:type] %>
+                </span>
+              </td>
+              <td class="py-2 px-3">
+                <span class="font-medium
+                  <%= case review[:rating]
+                      when 'Again' then 'text-red-600'
+                      when 'Hard' then 'text-gray-500'
+                      when 'Good' then 'text-green-600'
+                      when 'Easy' then 'text-blue-600'
+                      else 'text-gray-700'
+                      end %>">
+                  <%= review[:rating] %>
+                </span>
+              </td>
+              <td class="py-2 px-3 text-gray-600"><%= review[:interval] %></td>
+              <td class="py-2 px-3 text-gray-600"><%= review[:ease] %></td>
+              <td class="py-2 px-3 text-gray-600"><%= review[:time] %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <%# Actions %>
+  <div class="flex items-center justify-between">
+    <%= link_to "Back to Browse", notes_path, class: "text-sm text-gray-600 hover:text-gray-900" %>
   </div>
 </div>

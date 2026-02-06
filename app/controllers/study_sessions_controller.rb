@@ -71,6 +71,11 @@ class StudySessionsController < ApplicationController
     end
   end
 
+  # GET /decks/:deck_id/study/congrats
+  def congrats
+    @session_stats = @session_manager.statistics
+  end
+
   # POST /decks/:deck_id/study/undo
   def undo
     undo_data = session.delete(:last_answer_undo)

@@ -1,0 +1,45 @@
+<%# Browser toolbar: search field, Card/Note toggle %>
+<div class="toolbar flex-shrink-0">
+  <div class="flex-1 flex items-center gap-3">
+    <%# Search input %>
+    <div class="relative flex-1 max-w-lg">
+      <input type="text" placeholder="Search cards..."
+             value=""
+             class="form-input pl-8 py-1.5 text-sm"
+             data-browser-target="searchInput"
+             data-action="keydown.enter->browser#search">
+      <svg class="absolute left-2.5 top-2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+      </svg>
+    </div>
+
+    <%# Card/Note toggle %>
+    <div class="flex items-center bg-gray-200 rounded-md p-0.5">
+      <button class="px-3 py-1 text-xs font-medium rounded bg-white text-gray-900 shadow-sm"
+              data-browser-target="cardToggle"
+              data-action="click->browser#showCards">
+        Cards
+      </button>
+      <button class="px-3 py-1 text-xs font-medium rounded text-gray-600 hover:text-gray-900"
+              data-browser-target="noteToggle"
+              data-action="click->browser#showNotes">
+        Notes
+      </button>
+    </div>
+  </div>
+
+  <%# Right actions %>
+  <div class="flex items-center gap-1">
+    <button class="p-1.5 text-gray-500 hover:text-gray-700 rounded hover:bg-gray-200" title="Preview">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+      </svg>
+    </button>
+    <button class="p-1.5 text-gray-500 hover:text-gray-700 rounded hover:bg-gray-200" title="Column settings">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/>
+      </svg>
+    </button>
+  </div>
+</div>

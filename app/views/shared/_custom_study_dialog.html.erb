@@ -1,0 +1,42 @@
+<%# Custom Study modal dialog %>
+<div data-controller="modal">
+  <div data-modal-target="backdrop" class="hidden fixed inset-0 bg-black/50 z-40" data-action="click->modal#closeOnBackdrop"></div>
+  <div data-modal-target="dialog" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-md">
+      <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+        <h3 class="text-lg font-semibold text-gray-900">Custom Study</h3>
+        <button data-action="click->modal#close" class="text-gray-400 hover:text-gray-600">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+      <div class="p-6 space-y-3">
+        <button class="w-full text-left px-4 py-3 bg-gray-50 hover:bg-blue-50 rounded-md transition-colors">
+          <p class="text-sm font-medium text-gray-900">Increase today's new card limit</p>
+          <p class="text-xs text-gray-500">Study more new cards than your daily limit</p>
+        </button>
+        <button class="w-full text-left px-4 py-3 bg-gray-50 hover:bg-blue-50 rounded-md transition-colors">
+          <p class="text-sm font-medium text-gray-900">Increase today's review limit</p>
+          <p class="text-xs text-gray-500">Review more cards than your daily limit</p>
+        </button>
+        <button class="w-full text-left px-4 py-3 bg-gray-50 hover:bg-blue-50 rounded-md transition-colors">
+          <p class="text-sm font-medium text-gray-900">Review forgotten cards</p>
+          <p class="text-xs text-gray-500">Cards you answered Again on recently</p>
+        </button>
+        <button class="w-full text-left px-4 py-3 bg-gray-50 hover:bg-blue-50 rounded-md transition-colors">
+          <p class="text-sm font-medium text-gray-900">Review ahead</p>
+          <p class="text-xs text-gray-500">Study cards that are due in the next few days</p>
+        </button>
+        <button class="w-full text-left px-4 py-3 bg-gray-50 hover:bg-blue-50 rounded-md transition-colors">
+          <p class="text-sm font-medium text-gray-900">Preview new cards</p>
+          <p class="text-xs text-gray-500">Look at new cards without studying them</p>
+        </button>
+        <button class="w-full text-left px-4 py-3 bg-gray-50 hover:bg-blue-50 rounded-md transition-colors">
+          <p class="text-sm font-medium text-gray-900">Study by card state or tag</p>
+          <p class="text-xs text-gray-500">Select specific cards to study</p>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

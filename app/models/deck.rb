@@ -10,9 +10,6 @@ class Deck < ApplicationRecord
   has_many :cards, dependent: :restrict_with_error
   has_many :home_cards, class_name: "Card", foreign_key: "home_deck_id", dependent: :nullify
 
-  # JSONB accessor for deck options
-  store_accessor :options_json
-
   # Validations
   validates :name, presence: true, length: { maximum: 255 }
   validates :name, uniqueness: { scope: [:user_id, :parent_id] }, if: -> { deleted_at.nil? }

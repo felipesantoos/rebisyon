@@ -1,0 +1,19 @@
+<% content_for :title, "Editing Shared Deck" %>
+<% content_for :page_title, "Edit Shared Deck" %>
+
+<div class="space-y-6">
+  <div>
+    <h1 class="text-2xl font-semibold text-gray-900">Editing shared deck</h1>
+    <p class="mt-1 text-sm text-gray-500">Update your shared deck information.</p>
+  </div>
+
+  <div class="card">
+    <%= render "form", shared_deck: @shared_deck %>
+  </div>
+
+  <div class="flex items-center space-x-4">
+    <%= link_to "Show this shared deck", @shared_deck, class: "text-blue-600 hover:text-blue-700" %>
+    <span class="text-gray-400">|</span>
+    <%= link_to "Back to shared decks", shared_decks_path, class: "text-gray-600 hover:text-gray-900" %>
+  </div>
+</div>

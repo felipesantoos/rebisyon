@@ -1,0 +1,69 @@
+<% content_for :title, @filtered_deck[:name] %>
+<% content_for :page_title, @filtered_deck[:name] %>
+
+<div class="max-w-2xl mx-auto space-y-6">
+  <%= link_to "Back to filtered decks", filtered_decks_path, class: "text-sm text-gray-600 hover:text-gray-900 inline-flex items-center gap-1" %>
+
+  <%# Settings Card %>
+  <div class="card">
+    <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wider mb-3">Settings</h3>
+    <dl class="grid grid-cols-2 gap-3 text-sm">
+      <div>
+        <dt class="text-gray-500">Name</dt>
+        <dd class="font-medium text-gray-900"><%= @filtered_deck[:name] %></dd>
+      </div>
+      <div>
+        <dt class="text-gray-500">Search Filter</dt>
+        <dd class="bg-gray-100 px-2 py-1 rounded font-mono text-sm text-gray-700 inline-block"><%= @filtered_deck[:search_filter] %></dd>
+      </div>
+      <% if @filtered_deck[:search_filter_2] %>
+        <div>
+          <dt class="text-gray-500">Second Filter</dt>
+          <dd class="bg-gray-100 px-2 py-1 rounded font-mono text-sm text-gray-700 inline-block"><%= @filtered_deck[:search_filter_2] %></dd>
+        </div>
+      <% end %>
+      <div>
+        <dt class="text-gray-500">Card Limit</dt>
+        <dd class="font-medium text-gray-900"><%= @filtered_deck[:limit] %></dd>
+      </div>
+      <div>
+        <dt class="text-gray-500">Order</dt>
+        <dd class="font-medium text-gray-900"><%= @filtered_deck[:order] %></dd>
+      </div>
+      <div>
+        <dt class="text-gray-500">Reschedule</dt>
+        <dd class="font-medium text-gray-900"><%= @filtered_deck[:reschedule] ? "Yes" : "No" %></dd>
+      </div>
+    </dl>
+  </div>
+
+  <%# Card Count Stats %>
+  <div class="grid grid-cols-4 gap-4">
+    <div class="stat-card text-center">
+      <p class="text-2xl font-bold text-gray-900"><%= @filtered_deck[:card_count] %></p>
+      <p class="text-sm text-gray-500 mt-1">Total</p>
+    </div>
+    <div class="stat-card text-center">
+      <p class="text-2xl font-bold count-new"><%= @filtered_deck[:cards_new] %></p>
+      <p class="text-sm text-gray-500 mt-1">New</p>
+    </div>
+    <div class="stat-card text-center">
+      <p class="text-2xl font-bold count-learning"><%= @filtered_deck[:cards_learn] %></p>
+      <p class="text-sm text-gray-500 mt-1">Learning</p>
+    </div>
+    <div class="stat-card text-center">
+      <p class="text-2xl font-bold count-review"><%= @filtered_deck[:cards_review] %></p>
+      <p class="text-sm text-gray-500 mt-1">Review</p>
+    </div>
+  </div>
+
+  <%# Action Buttons %>
+  <div class="flex items-center gap-3">
+    <%= link_to "Study", "#", class: "btn-primary" %>
+    <%= link_to "Rebuild", "#", class: "btn-secondary" %>
+    <%= link_to "Edit", edit_filtered_deck_path(@filtered_deck[:id]), class: "btn-secondary" %>
+    <%= button_to "Delete", filtered_deck_path(@filtered_deck[:id]), method: :delete,
+        class: "btn-danger",
+        data: { turbo_confirm: "Are you sure you want to delete this filtered deck?" } %>
+  </div>
+</div>

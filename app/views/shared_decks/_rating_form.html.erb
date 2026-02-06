@@ -1,0 +1,31 @@
+<div class="card" data-controller="star-rating">
+  <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wider mb-3">Leave a Rating</h3>
+
+  <%= form_with url: shared_deck_ratings_path(shared_deck_id), method: :post, class: "space-y-4" do |form| %>
+    <%# Star rating widget %>
+    <div>
+      <label class="form-label">Rating</label>
+      <div class="flex items-center gap-1">
+        <% (1..5).each do |i| %>
+          <button type="button"
+                  class="text-2xl text-gray-300 hover:text-yellow-400 transition-colors cursor-pointer"
+                  data-star-rating-target="star"
+                  data-action="click->star-rating#select mouseenter->star-rating#hover mouseleave->star-rating#reset"
+                  data-value="<%= i %>">&#9733;</button>
+        <% end %>
+      </div>
+      <input type="hidden" name="rating[stars]" value="0" data-star-rating-target="input">
+    </div>
+
+    <%# Comment %>
+    <div>
+      <label for="rating_comment" class="form-label">Comment</label>
+      <textarea id="rating_comment" name="rating[comment]" rows="3" class="form-input w-full" placeholder="Share your thoughts about this deck..."></textarea>
+    </div>
+
+    <%# Submit %>
+    <div>
+      <button type="submit" class="btn-primary">Submit Rating</button>
+    </div>
+  <% end %>
+</div>

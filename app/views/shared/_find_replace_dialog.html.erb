@@ -1,0 +1,48 @@
+<%# Find and Replace modal dialog %>
+<div data-controller="modal">
+  <div data-modal-target="backdrop" class="hidden fixed inset-0 bg-black/50 z-40" data-action="click->modal#closeOnBackdrop"></div>
+  <div data-modal-target="dialog" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-lg">
+      <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+        <h3 class="text-lg font-semibold text-gray-900">Find and Replace</h3>
+        <button data-action="click->modal#close" class="text-gray-400 hover:text-gray-600">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+      <div class="p-6 space-y-4" data-controller="find-replace">
+        <div>
+          <label class="form-label">In</label>
+          <select class="form-select">
+            <option>All fields</option>
+            <option>Front</option>
+            <option>Back</option>
+          </select>
+        </div>
+        <div>
+          <label class="form-label">Find</label>
+          <input type="text" class="form-input" placeholder="Search text..." data-find-replace-target="findInput">
+        </div>
+        <div>
+          <label class="form-label">Replace with</label>
+          <input type="text" class="form-input" placeholder="Replacement text..." data-find-replace-target="replaceInput">
+        </div>
+        <div class="flex items-center gap-4">
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" class="w-4 h-4 text-blue-600 border-gray-300 rounded">
+            <span class="text-sm text-gray-700">Regular expression</span>
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" class="w-4 h-4 text-blue-600 border-gray-300 rounded">
+            <span class="text-sm text-gray-700">Match case</span>
+          </label>
+        </div>
+      </div>
+      <div class="px-6 py-4 border-t border-gray-200 flex justify-end gap-3">
+        <button class="btn-secondary" data-action="click->modal#close">Cancel</button>
+        <button class="btn-primary">Replace All</button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,32 +1,110 @@
 <% content_for :title, @note_type.name %>
 <% content_for :page_title, @note_type.name %>
+<% mock = mock_note_type_detail %>
 
-<div class="space-y-6">
-  <%# Actions %>
-  <div class="flex items-center space-x-4">
-    <%= link_to "Edit this note type", edit_note_type_path(@note_type), class: "btn-secondary" %>
-    <%= link_to "Back to note types", note_types_path, class: "text-gray-600 hover:text-gray-900" %>
-    <%= button_to "Destroy this note type", note_type_path(@note_type), method: :delete, 
-        class: "btn-danger", 
-        data: { confirm: "Are you sure?" } %>
+<div class="max-w-4xl mx-auto" data-controller="tabs">
+  <%# Tab navigation %>
+  <div class="border-b border-gray-200 mb-6">
+    <nav class="flex gap-6">
+      <button class="tab-active px-1 py-3 text-sm" data-tabs-target="tab" data-tab-index="0" data-action="click->tabs#select">
+        Fields
+      </button>
+      <button class="tab-inactive px-1 py-3 text-sm" data-tabs-target="tab" data-tab-index="1" data-action="click->tabs#select">
+        Cards
+      </button>
+      <button class="tab-inactive px-1 py-3 text-sm" data-tabs-target="tab" data-tab-index="2" data-action="click->tabs#select">
+        Styling
+      </button>
+    </nav>
   </div>
 
-  <%# Note Type Details %>
-  <div class="card">
-    <h2 class="text-xl font-semibold text-gray-900 mb-4">Note Type Details</h2>
-    <dl class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-      <div>
-        <dt class="text-sm font-medium text-gray-500">Name</dt>
-        <dd class="mt-1 text-sm text-gray-900"><%= @note_type.name %></dd>
+  <%# Fields tab %>
+  <div data-tabs-target="panel" data-controller="fields-editor">
+    <div class="card">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-lg font-semibold text-gray-900">Fields</h2>
+        <button class="btn-primary text-xs px-3 py-1.5" data-action="click->fields-editor#addField">
+          Add Field
+        </button>
       </div>
-      <div>
-        <dt class="text-sm font-medium text-gray-500">Fields</dt>
-        <dd class="mt-1 text-sm text-gray-900"><%= @note_type.field_names.join(", ") %></dd>
+      <div data-fields-editor-target="container" class="space-y-2">
+        <% mock[:fields].each_with_index do |field, index| %>
+          <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-md group" data-fields-editor-target="field">
+            <input type="hidden" value="<%= index %>" data-ordinal>
+            <%# Drag handle %>
+            <div class="cursor-move text-gray-300 hover:text-gray-500">
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M11 18c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm-2-8c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0-6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm6 4c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+              </svg>
+            </div>
+            <%# Field name %>
+            <input type="text" value="<%= field[:name] %>" class="form-input flex-1">
+            <%# Description %>
+            <input type="text" value="<%= field[:description] %>" placeholder="Description" class="form-input flex-1 text-gray-500">
+            <%# Actions %>
+            <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+              <button data-action="click->fields-editor#moveUp" class="p-1 text-gray-400 hover:text-gray-600 rounded hover:bg-gray-200">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg>
+              </button>
+              <button data-action="click->fields-editor#moveDown" class="p-1 text-gray-400 hover:text-gray-600 rounded hover:bg-gray-200">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+              </button>
+              <button data-action="click->fields-editor#removeField" class="p-1 text-gray-400 hover:text-red-600 rounded hover:bg-red-50">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+              </button>
+            </div>
+          </div>
+        <% end %>
       </div>
-      <div>
-        <dt class="text-sm font-medium text-gray-500">Card Types</dt>
-        <dd class="mt-1 text-sm text-gray-900"><%= @note_type.card_type_names.join(", ") %></dd>
+    </div>
+  </div>
+
+  <%# Cards tab %>
+  <div data-tabs-target="panel" class="hidden" data-controller="template-editor"
+       data-sample-fields='{"Front": "(Front)", "Back": "(Back)"}'>
+    <% mock[:card_types].each do |ct| %>
+      <div class="card mb-6">
+        <h2 class="text-lg font-semibold text-gray-900 mb-4"><%= ct[:name] %></h2>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="form-label">Front Template</label>
+            <textarea rows="6" class="form-input font-mono text-sm" data-template-editor-target="frontTemplate"
+                      data-action="input->template-editor#updatePreview"><%= ct[:front_template] %></textarea>
+            <p class="text-xs text-gray-500 mt-1">Available fields: <% mock[:fields].each do |f| %><code class="bg-gray-100 px-1 rounded">{{<%= f[:name] %>}}</code> <% end %></p>
+          </div>
+          <div>
+            <label class="form-label">Back Template</label>
+            <textarea rows="6" class="form-input font-mono text-sm" data-template-editor-target="backTemplate"
+                      data-action="input->template-editor#updatePreview"><%= ct[:back_template] %></textarea>
+          </div>
+        </div>
+        <%# Live preview %>
+        <div class="mt-4">
+          <label class="form-label">Preview</label>
+          <div class="border border-gray-200 rounded-md p-4 bg-gray-50 min-h-[80px]" data-template-editor-target="preview">
+          </div>
+        </div>
       </div>
-    </dl>
+    <% end %>
+  </div>
+
+  <%# Styling tab %>
+  <div data-tabs-target="panel" class="hidden">
+    <div class="card">
+      <h2 class="text-lg font-semibold text-gray-900 mb-4">Styling (CSS)</h2>
+      <textarea rows="15" class="form-input font-mono text-sm"
+                data-template-editor-target="styling"
+                data-action="input->template-editor#updatePreview"><%= mock[:card_types].first[:styling] %></textarea>
+      <p class="text-xs text-gray-500 mt-2">CSS applied to all card templates in this note type.</p>
+    </div>
+  </div>
+
+  <%# Actions %>
+  <div class="flex items-center justify-between mt-6">
+    <%= link_to "Back to note types", note_types_path, class: "text-sm text-gray-600 hover:text-gray-900" %>
+    <div class="flex items-center gap-2">
+      <button class="btn-secondary">Clone</button>
+      <button class="btn-primary">Save</button>
+    </div>
   </div>
 </div>

@@ -10,7 +10,7 @@ class Card < ApplicationRecord
   # Enums
   # Using _prefix: true to avoid conflict with ActiveRecord's new? method
   # PostgreSQL enum type card_state stores string values
-  enum state: { new: "new", learn: "learn", review: "review", relearn: "relearn" }, _prefix: :state
+  enum :state, { new: "new", learn: "learn", review: "review", relearn: "relearn" }, prefix: true
 
   # Validations
   validates :card_type_id, presence: true

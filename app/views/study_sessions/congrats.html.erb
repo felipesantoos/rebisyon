@@ -1,0 +1,60 @@
+<% content_for :title, "Congratulations!" %>
+<% content_for :page_title, "Study Complete" %>
+<% mock = mock_congrats %>
+
+<div class="max-w-lg mx-auto text-center space-y-8 py-12">
+  <%# Checkmark icon %>
+  <div class="mx-auto w-20 h-20 rounded-full bg-green-100 flex items-center justify-center">
+    <svg class="w-10 h-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+    </svg>
+  </div>
+
+  <div>
+    <h2 class="text-2xl font-bold text-gray-900">Congratulations!</h2>
+    <p class="mt-2 text-gray-500">You have finished this deck for now.</p>
+  </div>
+
+  <%# Session stats %>
+  <div class="card">
+    <div class="grid grid-cols-3 gap-6">
+      <div>
+        <p class="text-3xl font-bold text-gray-900"><%= mock[:cards_studied] %></p>
+        <p class="text-sm text-gray-500">Cards Studied</p>
+      </div>
+      <div>
+        <p class="text-3xl font-bold text-gray-900"><%= mock[:time_spent] %></p>
+        <p class="text-sm text-gray-500">Time Spent</p>
+      </div>
+      <div>
+        <p class="text-3xl font-bold text-green-600"><%= mock[:correct_percent] %>%</p>
+        <p class="text-sm text-gray-500">Correct</p>
+      </div>
+    </div>
+
+    <%# Rating breakdown %>
+    <div class="mt-6 pt-4 border-t border-gray-200">
+      <div class="flex items-center justify-center gap-6 text-sm">
+        <span><span class="font-semibold text-red-600"><%= mock[:again_count] %></span> Again</span>
+        <span><span class="font-semibold text-gray-500"><%= mock[:hard_count] %></span> Hard</span>
+        <span><span class="font-semibold text-green-600"><%= mock[:good_count] %></span> Good</span>
+        <span><span class="font-semibold text-blue-600"><%= mock[:easy_count] %></span> Easy</span>
+      </div>
+    </div>
+  </div>
+
+  <%# Next due info %>
+  <p class="text-sm text-gray-500">
+    Next review: <strong><%= mock[:next_due_count] %> cards</strong> due in <strong><%= mock[:next_due] %></strong>
+  </p>
+
+  <%# Action buttons %>
+  <div class="flex items-center justify-center gap-3">
+    <%= link_to root_path, class: "btn-primary" do %>
+      Back to Decks
+    <% end %>
+    <button type="button" class="btn-secondary" data-action="click->modal#open">
+      Custom Study
+    </button>
+  </div>
+</div>

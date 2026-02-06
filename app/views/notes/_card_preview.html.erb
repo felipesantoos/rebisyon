@@ -1,0 +1,33 @@
+<%# Card preview panel: front/back of selected card %>
+<div class="flex-shrink-0 border-t border-gray-200 bg-white" style="height: 200px;" data-browser-target="previewPanel">
+  <div class="h-full flex flex-col">
+    <%# Preview header %>
+    <div class="flex items-center justify-between px-3 py-1.5 bg-gray-50 border-b border-gray-200 flex-shrink-0">
+      <span class="text-xs font-medium text-gray-500">Preview</span>
+      <button class="text-xs text-gray-400 hover:text-gray-600" data-action="click->browser#togglePreview">
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+
+    <%# Preview content %>
+    <div class="flex-1 overflow-auto" data-browser-target="previewContent">
+      <div class="flex h-full">
+        <%# Front %>
+        <div class="flex-1 p-4 border-r border-gray-200">
+          <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-2">Front</p>
+          <div class="prose prose-sm max-w-none" data-browser-target="previewFront">
+            <p class="text-gray-400 italic text-sm">Select a card to preview</p>
+          </div>
+        </div>
+        <%# Back %>
+        <div class="flex-1 p-4">
+          <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-2">Back</p>
+          <div class="prose prose-sm max-w-none" data-browser-target="previewBack">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

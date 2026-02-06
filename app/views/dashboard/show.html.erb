@@ -1,44 +1,57 @@
-<% content_for :title, "Dashboard" %>
-<% content_for :page_title, "Dashboard" %>
+<% content_for :title, "Decks - Rebisyon" %>
+<% content_for :page_title, "Decks" %>
+<% content_for :page_actions do %>
+  <%= link_to new_deck_path, class: "btn-secondary inline-flex items-center gap-1.5" do %>
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+    </svg>
+    Create Deck
+  <% end %>
+<% end %>
 
-<div class="space-y-6">
-  <%# Stats Cards %>
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-    <div class="card">
-      <h3 class="text-sm font-medium text-gray-500 mb-1">Due Today</h3>
-      <p class="text-3xl font-semibold text-gray-900"><%= @total_due_cards %></p>
-    </div>
-    <div class="card">
-      <h3 class="text-sm font-medium text-gray-500 mb-1">New Cards</h3>
-      <p class="text-3xl font-semibold text-gray-900"><%= @total_new_cards %></p>
-    </div>
-    <div class="card">
-      <h3 class="text-sm font-medium text-gray-500 mb-1">Learning</h3>
-      <p class="text-3xl font-semibold text-gray-900"><%= @total_learning_cards %></p>
-    </div>
+<div class="max-w-4xl mx-auto" data-controller="deck-tree">
+  <%# Deck Tree Table %>
+  <div class="card p-0">
+    <table class="w-full">
+      <thead>
+        <tr class="border-b border-gray-200">
+          <th class="text-left text-xs font-medium text-gray-500 uppercase tracking-wider py-3 px-4">Deck</th>
+          <th class="text-right text-xs font-medium text-blue-500 uppercase tracking-wider py-3 px-3 w-20">New</th>
+          <th class="text-right text-xs font-medium text-orange-500 uppercase tracking-wider py-3 px-3 w-20">Learn</th>
+          <th class="text-right text-xs font-medium text-green-500 uppercase tracking-wider py-3 px-3 w-20">Due</th>
+          <th class="w-10 py-3 px-3"></th>
+        </tr>
+      </thead>
+      <tbody>
+        <%= render "shared/deck_tree", decks: @deck_tree, show_gear: true, show_study: true %>
+      </tbody>
+      <tfoot>
+        <tr class="border-t-2 border-gray-200 bg-gray-50">
+          <td class="py-2 px-4 text-sm font-semibold text-gray-700">Total</td>
+          <td class="py-2 px-3 text-right">
+            <span class="count-new text-sm font-bold"><%= @totals[:new_count] %></span>
+          </td>
+          <td class="py-2 px-3 text-right">
+            <span class="count-learning text-sm font-bold"><%= @totals[:learn_count] %></span>
+          </td>
+          <td class="py-2 px-3 text-right">
+            <span class="count-review text-sm font-bold"><%= @totals[:due_count] %></span>
+          </td>
+          <td class="py-2 px-3"></td>
+        </tr>
+      </tfoot>
+    </table>
   </div>
 
-  <%# Decks Section %>
-  <div class="card">
-    <div class="flex items-center justify-between mb-4">
-      <h2 class="text-xl font-semibold text-gray-900">Your Decks</h2>
-      <%= link_to "New deck", new_deck_path, class: "btn-primary" %>
+  <%# Bottom actions %>
+  <div class="mt-4 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <%= link_to new_deck_path, class: "text-sm text-blue-600 hover:text-blue-700 font-medium" do %>
+        Create Deck
+      <% end %>
     </div>
-
-    <% if @deck_stats.empty? %>
-      <div class="text-center py-12">
-        <p class="text-gray-500 mb-4">No decks yet. Create your first deck to get started.</p>
-        <%= link_to "Create your first deck", new_deck_path, class: "btn-primary inline-block" %>
-      </div>
-    <% else %>
-      <div class="space-y-2">
-        <% @deck_stats.each do |deck| %>
-          <div class="flex items-center justify-between p-3 bg-gray-50 rounded-md hover:bg-gray-100 transition-colors">
-            <span class="text-gray-900 font-medium"><%= deck.name %></span>
-            <%= link_to "View", deck_path(deck), class: "text-blue-600 hover:text-blue-700 text-sm font-medium" %>
-          </div>
-        <% end %>
-      </div>
-    <% end %>
+    <div class="text-xs text-gray-500">
+      Studied <strong>47</strong> cards in <strong>23</strong> minutes today
+    </div>
   </div>
 </div>

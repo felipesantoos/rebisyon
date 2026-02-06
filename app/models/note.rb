@@ -10,9 +10,6 @@ class Note < ApplicationRecord
   has_many :note_media, dependent: :destroy
   has_many :media, through: :note_media
 
-  # JSONB accessor for fields
-  store_accessor :fields_json
-
   # Temporary attribute for deck_id (used during creation)
   attr_accessor :deck_id
 
@@ -20,7 +17,6 @@ class Note < ApplicationRecord
   validates :guid, presence: true, uniqueness: { scope: :deleted_at, conditions: -> { where(deleted_at: nil) } }
   validates :guid, format: { with: /\A[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\z/i }
   validates :fields_json, presence: true
-  validates :tags, presence: true
 
   # Callbacks
   before_validation :generate_guid, on: :create

@@ -1,205 +1,219 @@
-<% content_for :page_title, t("user_preferences.title") %>
+<% content_for :title, "Preferences" %>
+<% content_for :page_title, "Preferences" %>
 
-<div class="max-w-4xl space-y-6">
-  <div>
-    <h1 class="text-2xl font-semibold text-gray-900"><%= t("user_preferences.title") %></h1>
-    <p class="mt-1 text-sm text-gray-500">Customize your learning experience</p>
-  </div>
-
+<div class="max-w-3xl mx-auto space-y-6">
   <%= form_with model: @user_preference, url: user_preferences_path, method: :patch, class: "space-y-6" do |f| %>
-    <%# Display Settings %>
-    <section class="card">
-      <h2 class="text-lg font-semibold text-gray-900 mb-6">Display</h2>
-      
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <%# Language %>
-        <div>
-          <%= f.label :language, class: "block text-sm font-medium text-gray-700 mb-2" %>
-          <%= f.select :language, 
-              [["English", "en"], ["Português (Brasil)", "pt-BR"]], 
-              {}, 
-              class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" %>
-        </div>
 
-        <%# Theme %>
+    <%# Scheduler %>
+    <section class="card" data-controller="collapsible" data-collapsible-open-value="true">
+      <div class="collapsible-header -mx-6 -mt-6 px-6 pt-4 pb-2" data-action="click->collapsible#toggle">
+        <h2 class="text-lg font-semibold text-gray-900">Scheduler</h2>
+        <svg data-collapsible-target="icon" class="w-4 h-4 text-gray-400 transition-transform" style="transform: rotate(90deg)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+        </svg>
+      </div>
+      <div data-collapsible-target="content" class="mt-4 space-y-4">
         <div>
-          <%= f.label :theme, class: "block text-sm font-medium text-gray-700 mb-2" %>
-          <%= f.select :theme, 
-              [["Auto", "auto"], ["Light", "light"], ["Dark", "dark"]], 
-              {}, 
-              class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" %>
-        </div>
-
-        <%# UI Size %>
-        <div>
-          <%= f.label :ui_size, class: "block text-sm font-medium text-gray-700 mb-2" %>
-          <%= f.number_field :ui_size, 
-              min: 0.5, max: 3.0, step: 0.1,
-              class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" %>
-          <p class="mt-1 text-xs text-gray-500">Scale factor (0.5 - 3.0)</p>
+          <label class="form-label">Scheduling algorithm</label>
+          <div class="space-y-2">
+            <label class="flex items-center gap-3 cursor-pointer">
+              <input type="radio" name="scheduler" value="sm2" checked class="w-4 h-4 text-blue-600 border-gray-300">
+              <div>
+                <span class="text-sm text-gray-700 font-medium">SM-2</span>
+                <p class="text-xs text-gray-500">Classic Anki algorithm</p>
+              </div>
+            </label>
+            <label class="flex items-center gap-3 cursor-pointer">
+              <input type="radio" name="scheduler" value="fsrs" class="w-4 h-4 text-blue-600 border-gray-300">
+              <div>
+                <span class="text-sm text-gray-700 font-medium">FSRS</span>
+                <p class="text-xs text-gray-500">Free Spaced Repetition Scheduler - more accurate, adapts to your memory</p>
+              </div>
+            </label>
+          </div>
         </div>
       </div>
+    </section>
 
-      <div class="mt-6 space-y-4">
-        <label class="flex items-center gap-3 cursor-pointer">
-          <%= f.check_box :minimalist_mode, class: "w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500" %>
-          <span class="text-sm text-gray-700">Minimalist mode</span>
-        </label>
-
-        <label class="flex items-center gap-3 cursor-pointer">
-          <%= f.check_box :reduce_motion, class: "w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500" %>
-          <span class="text-sm text-gray-700">Reduce motion</span>
-        </label>
+    <%# Display Settings %>
+    <section class="card" data-controller="collapsible" data-collapsible-open-value="true">
+      <div class="collapsible-header -mx-6 -mt-6 px-6 pt-4 pb-2" data-action="click->collapsible#toggle">
+        <h2 class="text-lg font-semibold text-gray-900">Display</h2>
+        <svg data-collapsible-target="icon" class="w-4 h-4 text-gray-400 transition-transform" style="transform: rotate(90deg)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+        </svg>
+      </div>
+      <div data-collapsible-target="content" class="mt-4 space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="form-label">Language</label>
+            <%= f.select :language, [["English", "en"], ["Portugu\u00EAs (Brasil)", "pt-BR"]], {}, class: "form-select" %>
+          </div>
+          <div>
+            <label class="form-label">Theme</label>
+            <%= f.select :theme, [["Auto", "auto"], ["Light", "light"], ["Dark", "dark"]], {}, class: "form-select" %>
+          </div>
+          <div>
+            <label class="form-label">UI Scale</label>
+            <%= f.number_field :ui_size, min: 0.5, max: 3.0, step: 0.1, class: "form-input" %>
+            <p class="text-xs text-gray-500 mt-1">Scale factor (0.5 - 3.0)</p>
+          </div>
+        </div>
+        <div class="space-y-3">
+          <label class="flex items-center gap-3 cursor-pointer">
+            <%= f.check_box :minimalist_mode, class: "w-4 h-4 text-blue-600 border-gray-300 rounded" %>
+            <span class="text-sm text-gray-700">Minimalist mode</span>
+          </label>
+          <label class="flex items-center gap-3 cursor-pointer">
+            <%= f.check_box :reduce_motion, class: "w-4 h-4 text-blue-600 border-gray-300 rounded" %>
+            <span class="text-sm text-gray-700">Reduce motion</span>
+          </label>
+        </div>
       </div>
     </section>
 
     <%# Study Settings %>
-    <section class="card">
-      <h2 class="text-lg font-semibold text-gray-900 mb-6">Study</h2>
-      
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <%# Next day starts at %>
-        <div>
-          <%= f.label :next_day_starts_at, "Next day starts at", class: "block text-sm font-medium text-gray-700 mb-2" %>
-          <%= f.time_field :next_day_starts_at, 
-              class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" %>
-          <p class="mt-1 text-xs text-gray-500">When reviews reset for a new day</p>
-        </div>
-
-        <%# Learn ahead limit %>
-        <div>
-          <%= f.label :learn_ahead_limit, "Learn ahead limit (minutes)", class: "block text-sm font-medium text-gray-700 mb-2" %>
-          <%= f.number_field :learn_ahead_limit, 
-              min: 0, max: 120,
-              class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" %>
-        </div>
-
-        <%# Timebox limit %>
-        <div>
-          <%= f.label :timebox_time_limit, "Timebox limit (minutes)", class: "block text-sm font-medium text-gray-700 mb-2" %>
-          <%= f.number_field :timebox_time_limit, 
-              min: 0, max: 120,
-              class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" %>
-          <p class="mt-1 text-xs text-gray-500">0 to disable</p>
-        </div>
+    <section class="card" data-controller="collapsible" data-collapsible-open-value="true">
+      <div class="collapsible-header -mx-6 -mt-6 px-6 pt-4 pb-2" data-action="click->collapsible#toggle">
+        <h2 class="text-lg font-semibold text-gray-900">Study</h2>
+        <svg data-collapsible-target="icon" class="w-4 h-4 text-gray-400 transition-transform" style="transform: rotate(90deg)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+        </svg>
       </div>
-
-      <div class="mt-6 space-y-4">
-        <label class="flex items-center gap-3 cursor-pointer">
-          <%= f.check_box :show_remaining_count, class: "w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500" %>
-          <span class="text-sm text-gray-700">Show remaining card count</span>
-        </label>
-
-        <label class="flex items-center gap-3 cursor-pointer">
-          <%= f.check_box :show_next_review_time, class: "w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500" %>
-          <span class="text-sm text-gray-700">Show next review time on buttons</span>
-        </label>
-
-        <label class="flex items-center gap-3 cursor-pointer">
-          <%= f.check_box :spacebar_answers_card, class: "w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500" %>
-          <span class="text-sm text-gray-700">Spacebar answers card</span>
-        </label>
+      <div data-collapsible-target="content" class="mt-4 space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="form-label">Next day starts at</label>
+            <%= f.time_field :next_day_starts_at, class: "form-input" %>
+          </div>
+          <div>
+            <label class="form-label">Learn ahead limit (minutes)</label>
+            <%= f.number_field :learn_ahead_limit, min: 0, max: 120, class: "form-input" %>
+          </div>
+          <div>
+            <label class="form-label">Timebox limit (minutes)</label>
+            <%= f.number_field :timebox_time_limit, min: 0, max: 120, class: "form-input" %>
+            <p class="text-xs text-gray-500 mt-1">0 to disable</p>
+          </div>
+        </div>
+        <div class="space-y-3">
+          <label class="flex items-center gap-3 cursor-pointer">
+            <%= f.check_box :show_remaining_count, class: "w-4 h-4 text-blue-600 border-gray-300 rounded" %>
+            <span class="text-sm text-gray-700">Show remaining card count</span>
+          </label>
+          <label class="flex items-center gap-3 cursor-pointer">
+            <%= f.check_box :show_next_review_time, class: "w-4 h-4 text-blue-600 border-gray-300 rounded" %>
+            <span class="text-sm text-gray-700">Show next review time on buttons</span>
+          </label>
+          <label class="flex items-center gap-3 cursor-pointer">
+            <%= f.check_box :spacebar_answers_card, class: "w-4 h-4 text-blue-600 border-gray-300 rounded" %>
+            <span class="text-sm text-gray-700">Spacebar answers card</span>
+          </label>
+        </div>
       </div>
     </section>
 
-    <%# Audio/Video Settings %>
-    <section class="card">
-      <h2 class="text-lg font-semibold text-gray-900 mb-6">Audio & Video</h2>
-      
-      <div class="space-y-4">
+    <%# Audio/Video %>
+    <section class="card" data-controller="collapsible" data-collapsible-open-value="false">
+      <div class="collapsible-header -mx-6 -mt-6 px-6 pt-4 pb-2" data-action="click->collapsible#toggle">
+        <h2 class="text-lg font-semibold text-gray-900">Audio & Video</h2>
+        <svg data-collapsible-target="icon" class="w-4 h-4 text-gray-400 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+        </svg>
+      </div>
+      <div data-collapsible-target="content" class="hidden mt-4 space-y-3">
         <label class="flex items-center gap-3 cursor-pointer">
-          <%= f.check_box :show_play_buttons, class: "w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500" %>
+          <%= f.check_box :show_play_buttons, class: "w-4 h-4 text-blue-600 border-gray-300 rounded" %>
           <span class="text-sm text-gray-700">Show play buttons</span>
         </label>
-
         <label class="flex items-center gap-3 cursor-pointer">
-          <%= f.check_box :interrupt_audio_on_answer, class: "w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500" %>
+          <%= f.check_box :interrupt_audio_on_answer, class: "w-4 h-4 text-blue-600 border-gray-300 rounded" %>
           <span class="text-sm text-gray-700">Interrupt audio when showing answer</span>
         </label>
       </div>
     </section>
 
-    <%# Editing Settings %>
-    <section class="card">
-      <h2 class="text-lg font-semibold text-gray-900 mb-6">Editing</h2>
-      
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+    <%# Editing %>
+    <section class="card" data-controller="collapsible" data-collapsible-open-value="false">
+      <div class="collapsible-header -mx-6 -mt-6 px-6 pt-4 pb-2" data-action="click->collapsible#toggle">
+        <h2 class="text-lg font-semibold text-gray-900">Editing</h2>
+        <svg data-collapsible-target="icon" class="w-4 h-4 text-gray-400 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+        </svg>
+      </div>
+      <div data-collapsible-target="content" class="hidden mt-4 space-y-4">
         <div>
-          <%= f.label :default_deck_behavior, "Default deck", class: "block text-sm font-medium text-gray-700 mb-2" %>
-          <%= f.select :default_deck_behavior, 
-              [["Current deck", "current_deck"], ["Last deck used to add", "last_deck_used_to_add"], ["First field", "first_field"]], 
-              {}, 
-              class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" %>
+          <label class="form-label">Default deck</label>
+          <%= f.select :default_deck_behavior,
+              [["Current deck", "current_deck"], ["Last deck used to add", "last_deck_used_to_add"], ["First field", "first_field"]],
+              {}, class: "form-select" %>
         </div>
-      </div>
-
-      <div class="space-y-4">
-        <label class="flex items-center gap-3 cursor-pointer">
-          <%= f.check_box :paste_strips_formatting, class: "w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500" %>
-          <span class="text-sm text-gray-700">Paste strips formatting</span>
-        </label>
-
-        <label class="flex items-center gap-3 cursor-pointer">
-          <%= f.check_box :paste_images_as_png, class: "w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500" %>
-          <span class="text-sm text-gray-700">Paste images as PNG</span>
-        </label>
-      </div>
-    </section>
-
-    <%# Search Settings %>
-    <section class="card">
-      <h2 class="text-lg font-semibold text-gray-900 mb-6">Search</h2>
-      
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-        <div>
-          <%= f.label :default_search_text, "Default search", class: "block text-sm font-medium text-gray-700 mb-2" %>
-          <%= f.text_field :default_search_text, 
-              placeholder: "e.g., deck:current",
-              class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500" %>
-        </div>
-      </div>
-
-      <div class="space-y-4">
-        <label class="flex items-center gap-3 cursor-pointer">
-          <%= f.check_box :ignore_accents_in_search, class: "w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500" %>
-          <span class="text-sm text-gray-700">Ignore accents in search</span>
-        </label>
-      </div>
-    </section>
-
-    <%# Sync Settings %>
-    <section class="card">
-      <h2 class="text-lg font-semibold text-gray-900 mb-6">Synchronization</h2>
-      
-      <div class="space-y-4">
-        <label class="flex items-center gap-3 cursor-pointer">
-          <%= f.check_box :auto_sync, class: "w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500" %>
-          <span class="text-sm text-gray-700">Auto sync on open/close</span>
-        </label>
-
-        <label class="flex items-center gap-3 cursor-pointer">
-          <%= f.check_box :sync_audio_and_images, class: "w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500" %>
-          <span class="text-sm text-gray-700">Sync audio and images</span>
-        </label>
-
-        <label class="flex items-center gap-3 cursor-pointer">
-          <%= f.check_box :periodically_sync_media, class: "w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500" %>
-          <span class="text-sm text-gray-700">Periodically sync media</span>
-        </label>
-      </div>
-
-      <div class="mt-6 pt-6 border-t border-gray-200">
-        <div>
-          <%= f.label :self_hosted_sync_server_url, "Self-hosted sync server URL", class: "block text-sm font-medium text-gray-700 mb-2" %>
-          <%= f.text_field :self_hosted_sync_server_url, 
-              placeholder: "https://your-server.com/sync",
-              class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500" %>
-          <p class="mt-1 text-xs text-gray-500">Leave empty to use the default server</p>
+        <div class="space-y-3">
+          <label class="flex items-center gap-3 cursor-pointer">
+            <%= f.check_box :paste_strips_formatting, class: "w-4 h-4 text-blue-600 border-gray-300 rounded" %>
+            <span class="text-sm text-gray-700">Paste strips formatting</span>
+          </label>
+          <label class="flex items-center gap-3 cursor-pointer">
+            <%= f.check_box :paste_images_as_png, class: "w-4 h-4 text-blue-600 border-gray-300 rounded" %>
+            <span class="text-sm text-gray-700">Paste images as PNG</span>
+          </label>
         </div>
       </div>
     </section>
 
-    <%# Submit button %>
+    <%# Sync %>
+    <section class="card" data-controller="collapsible" data-collapsible-open-value="false">
+      <div class="collapsible-header -mx-6 -mt-6 px-6 pt-4 pb-2" data-action="click->collapsible#toggle">
+        <h2 class="text-lg font-semibold text-gray-900">Synchronization</h2>
+        <svg data-collapsible-target="icon" class="w-4 h-4 text-gray-400 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+        </svg>
+      </div>
+      <div data-collapsible-target="content" class="hidden mt-4 space-y-4">
+        <div class="space-y-3">
+          <label class="flex items-center gap-3 cursor-pointer">
+            <%= f.check_box :auto_sync, class: "w-4 h-4 text-blue-600 border-gray-300 rounded" %>
+            <span class="text-sm text-gray-700">Auto sync on open/close</span>
+          </label>
+          <label class="flex items-center gap-3 cursor-pointer">
+            <%= f.check_box :sync_audio_and_images, class: "w-4 h-4 text-blue-600 border-gray-300 rounded" %>
+            <span class="text-sm text-gray-700">Sync audio and images</span>
+          </label>
+        </div>
+        <div class="pt-4 border-t border-gray-200">
+          <label class="form-label">Self-hosted sync server URL</label>
+          <%= f.text_field :self_hosted_sync_server_url, placeholder: "https://your-server.com/sync", class: "form-input" %>
+          <p class="text-xs text-gray-500 mt-1">Leave empty to use the default server</p>
+        </div>
+      </div>
+    </section>
+
+    <%# Maintenance buttons %>
+    <section class="card">
+      <h2 class="text-lg font-semibold text-gray-900 mb-4">Maintenance</h2>
+      <div class="flex flex-wrap gap-3">
+        <%= link_to check_database_logs_path, class: "btn-secondary inline-flex items-center gap-2" do %>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"/>
+          </svg>
+          Check Database
+        <% end %>
+        <%= link_to backups_path, class: "btn-secondary inline-flex items-center gap-2" do %>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/>
+          </svg>
+          Create Backup
+        <% end %>
+        <%= link_to check_media_path, class: "btn-secondary inline-flex items-center gap-2" do %>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+          </svg>
+          Check Media
+        <% end %>
+      </div>
+    </section>
+
+    <%# Submit %>
     <div class="flex justify-end gap-4">
       <%= link_to "Cancel", dashboard_path, class: "btn-secondary" %>
       <%= f.submit "Save preferences", class: "btn-primary" %>

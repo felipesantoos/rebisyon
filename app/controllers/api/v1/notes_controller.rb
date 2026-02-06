@@ -31,7 +31,7 @@ module Api
 
       # DELETE /api/v1/notes/:id
       def destroy
-        current_user.deletions_logs.create!(
+        current_user.deletion_logs.create!(
           object_type: "note",
           object_id: @note.id,
           deleted_at: Time.current,

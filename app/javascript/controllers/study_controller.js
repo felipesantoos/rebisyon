@@ -1,6 +1,6 @@
 import { Controller } from "@hotwired/stimulus"
 
-// Connects to data-controller="study"
+// Enhanced study controller with timer, keyboard shortcuts, progress updates
 export default class extends Controller {
   static values = {
     cardId: Number,
@@ -9,136 +9,133 @@ export default class extends Controller {
     answerUrl: String
   }
 
-  static targets = ["showAnswerBtn", "ratingButtons", "answerForm", "cardId", "timeMs"]
+  static targets = ["showAnswerBtn", "ratingButtons", "answerForm", "cardId", "timeMs", "front", "back", "timer"]
 
   connect() {
     this.startTime = Date.now()
+    this.answerShown = false
     this.rating = null
-    
-    // Add keyboard event listeners
-    document.addEventListener("keydown", this.handleKeyDown.bind(this))
+    this.timerInterval = null
+
+    this.boundKeydown = this.handleKeydown.bind(this)
+    document.addEventListener("keydown", this.boundKeydown)
+
+    this.startTimer()
   }
 
   disconnect() {
-    document.removeEventListener("keydown", this.handleKeyDown.bind(this))
+    document.removeEventListener("keydown", this.boundKeydown)
+    if (this.timerInterval) clearInterval(this.timerInterval)
   }
 
-  // Handles keyboard shortcuts
-  handleKeyDown(event) {
-    // Don't handle if user is typing in an input
-    if (event.target.tagName === "INPUT" || event.target.tagName === "TEXTAREA") {
+  startTimer() {
+    if (this.hasTimerTarget) {
+      this.timerInterval = setInterval(() => {
+        const elapsed = Math.floor((Date.now() - this.startTime) / 1000)
+        const mins = Math.floor(elapsed / 60)
+        const secs = elapsed % 60
+        this.timerTarget.textContent = `${mins}:${secs.toString().padStart(2, "0")}`
+      }, 1000)
+    }
+  }
+
+  handleKeydown(event) {
+    if (event.target.tagName === "INPUT" || event.target.tagName === "TEXTAREA") return
+
+    // Ctrl+Z for undo
+    if (event.ctrlKey && event.key === "z") {
+      event.preventDefault()
+      this.undo()
+      return
+    }
+
+    // E for edit
+    if (event.key === "e" || event.key === "E") {
+      event.preventDefault()
       return
     }
 
     switch (event.key) {
       case " ":
-        // Space to show answer
         event.preventDefault()
-        if (this.showAnswerBtnTarget && !this.showAnswerBtnTarget.classList.contains("hidden")) {
+        if (!this.answerShown) {
           this.showAnswer()
+        } else {
+          // Space rates Good when answer is shown
+          this.rate({ currentTarget: { dataset: { rating: "3" } } })
         }
         break
       case "1":
-        event.preventDefault()
-        this.setRating(1)
-        this.submitAnswer()
+        if (this.answerShown) { event.preventDefault(); this.rate({ currentTarget: { dataset: { rating: "1" } } }) }
         break
       case "2":
-        event.preventDefault()
-        this.setRating(2)
-        this.submitAnswer()
+        if (this.answerShown) { event.preventDefault(); this.rate({ currentTarget: { dataset: { rating: "2" } } }) }
         break
       case "3":
-        event.preventDefault()
-        this.setRating(3)
-        this.submitAnswer()
+        if (this.answerShown) { event.preventDefault(); this.rate({ currentTarget: { dataset: { rating: "3" } } }) }
         break
       case "4":
-        event.preventDefault()
-        this.setRating(4)
-        this.submitAnswer()
+        if (this.answerShown) { event.preventDefault(); this.rate({ currentTarget: { dataset: { rating: "4" } } }) }
         break
     }
   }
 
-  // Shows the answer side of the card
   showAnswer() {
-    if (!this.showAnswerUrlValue) return
-
-    // Hide show answer button
-    if (this.showAnswerBtnTarget) {
-      this.showAnswerBtnTarget.classList.add("hidden")
-    }
-
-    // Show rating buttons
-    if (this.ratingButtonsTarget) {
-      this.ratingButtonsTarget.classList.remove("hidden")
-    }
-
-    // Record time taken to show answer
+    this.answerShown = true
     this.answerShownAt = Date.now()
 
-    // Make request to show answer (updates UI via Turbo Stream)
-    fetch(this.showAnswerUrlValue, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-        "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').content,
-        "Accept": "text/vnd.turbo-stream.html"
-      },
-      body: new URLSearchParams({
-        card_id: this.cardIdValue
+    // Hide front, show back
+    if (this.hasFrontTarget) this.frontTarget.classList.add("hidden")
+    if (this.hasBackTarget) this.backTarget.classList.remove("hidden")
+
+    // Toggle buttons
+    if (this.hasShowAnswerBtnTarget) this.showAnswerBtnTarget.classList.add("hidden")
+    if (this.hasRatingButtonsTarget) this.ratingButtonsTarget.classList.remove("hidden")
+
+    // If we have a server-side show answer URL, fetch it
+    if (this.showAnswerUrlValue && this.cardIdValue) {
+      fetch(this.showAnswerUrlValue, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]')?.content || "",
+          "Accept": "text/vnd.turbo-stream.html"
+        },
+        body: new URLSearchParams({ card_id: this.cardIdValue })
       })
-    })
-      .then(response => response.text())
-      .then(html => {
-        Turbo.renderStreamMessage(html)
-      })
-      .catch(error => {
-        console.error("Error showing answer:", error)
-      })
+        .then(response => response.text())
+        .then(html => { if (typeof Turbo !== "undefined") Turbo.renderStreamMessage(html) })
+        .catch(error => console.error("Error showing answer:", error))
+    }
   }
 
-  // Sets the rating
-  setRating(rating) {
+  rate(event) {
+    const rating = parseInt(event.currentTarget.dataset.rating, 10)
     this.rating = rating
-  }
 
-  // Submits the answer
-  submitAnswer(event) {
-    if (event) {
-      event.preventDefault()
-    }
-
-    if (!this.rating) {
-      console.error("No rating set")
-      return
-    }
-
-    // Calculate time taken
-    const timeMs = this.answerShownAt 
-      ? Date.now() - this.answerShownAt 
+    const timeMs = this.answerShownAt
+      ? Date.now() - this.answerShownAt
       : Date.now() - this.startTime
 
-    // Update hidden fields
-    if (this.cardIdTarget) {
-      this.cardIdTarget.value = this.cardIdValue
-    }
-    if (this.timeMsTarget) {
-      this.timeMsTarget.value = timeMs
-    }
+    // If we have a real form, submit it
+    if (this.hasAnswerFormTarget) {
+      if (this.hasCardIdTarget) this.cardIdTarget.value = this.cardIdValue
+      if (this.hasTimeMsTarget) this.timeMsTarget.value = timeMs
 
-    // Submit form
-    if (this.answerFormTarget) {
-      // Create a hidden input for rating
       const ratingInput = document.createElement("input")
       ratingInput.type = "hidden"
       ratingInput.name = "rating"
-      ratingInput.value = this.rating
+      ratingInput.value = rating
       this.answerFormTarget.appendChild(ratingInput)
-
-      // Submit via Turbo
       this.answerFormTarget.requestSubmit()
+    } else {
+      // Mock mode: just reload
+      window.location.reload()
     }
+  }
+
+  undo() {
+    // In real mode, would POST to undo endpoint
+    console.log("Undo triggered")
   }
 }

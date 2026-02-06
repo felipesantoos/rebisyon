@@ -16,12 +16,36 @@ Rails.application.routes.draw do
         post "auth/sign_up", to: "registrations#create"
       end
 
-      # API resources (to be expanded)
+      # Core data
       resources :decks, only: %i[index show create update destroy]
       resources :note_types, only: %i[index show create update destroy]
       resources :notes, only: %i[index show create update destroy]
+      resources :cards, only: %i[index show update]
+      resources :reviews, only: %i[index show]
+      resources :media, only: %i[index show create destroy]
+
+      # Configuration
       resource :user_preferences, only: %i[show update]
-      resource :profile, only: %i[show update]
+      resources :filtered_decks, only: %i[index show create update destroy]
+      resources :backups, only: %i[index show create destroy]
+      resources :deck_options_presets, only: %i[index show create update destroy]
+      resources :saved_searches, only: %i[index create update destroy]
+      resources :flag_names, only: %i[index create update destroy]
+      resource :browser_config, only: %i[show update]
+      resources :add_ons, only: %i[index show create update destroy]
+      resources :profiles, only: %i[index show create update destroy]
+
+      # Sync and audit
+      resources :sync_meta, only: %i[index show create update destroy]
+      resources :undo_histories, only: :index
+      resources :deletion_logs, only: :index
+      resources :check_database_logs, only: %i[index show]
+
+      # Sharing
+      resources :shared_decks, only: %i[index show create update destroy] do
+        resources :ratings, only: %i[index create update destroy],
+                  controller: "shared_deck_ratings"
+      end
     end
   end
 
@@ -46,6 +70,7 @@ Rails.application.routes.draw do
       post :answer
       post :show_answer
       post :undo
+      get :congrats
     end
   end
 
@@ -76,8 +101,49 @@ Rails.application.routes.draw do
   # Browser config (singular)
   resource :browser_config, only: %i[show update]
 
+  # Import/Export
+  resources :imports, only: %i[new create]
+  resources :exports, only: %i[new create]
+
   # Media management
-  resources :media, only: %i[index show create destroy]
+  resources :media, only: %i[index show create destroy] do
+    collection do
+      post :check
+    end
+  end
+
+  # Check database
+  resources :check_database_logs, only: %i[index show], path: "check-database"
+
+  # Backups
+  resources :backups, only: %i[index show create destroy]
+
+  # Profiles
+  resources :profiles
+
+  # Filtered decks
+  resources :filtered_decks
+
+  # Add-ons
+  resources :add_ons, only: %i[index show create update destroy], path: "add-ons"
+
+  # Shared decks
+  resources :shared_decks do
+    resources :ratings, only: %i[create update destroy], controller: "shared_deck_ratings"
+  end
+
+  # Deletion logs (trash)
+  resources :deletion_logs, only: %i[index show], path: "trash" do
+    member do
+      post :restore
+    end
+  end
+
+  # Undo history
+  resources :undo_histories, only: %i[index show], path: "undo-history"
+
+  # Sync status
+  resources :sync_metas, only: %i[index], path: "sync"
 
   # Statistics (to be expanded in Phase 5)
   resource :statistics, only: :show

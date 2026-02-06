@@ -2,7 +2,6 @@
 
 class User < ApplicationRecord
   include SoftDeletable
-  include Devise::JWT::RevocationStrategies::Denylist
 
   # Devise modules
   devise :database_authenticatable, :registerable,
@@ -19,7 +18,7 @@ class User < ApplicationRecord
   has_many :backups, dependent: :destroy
   has_many :filtered_decks, dependent: :destroy
   has_many :deck_options_presets, dependent: :destroy
-  has_many :deletions_logs, dependent: :destroy
+  has_many :deletion_logs, dependent: :destroy
   has_many :saved_searches, dependent: :destroy
   has_many :flag_names, dependent: :destroy
   has_one :browser_config, dependent: :destroy

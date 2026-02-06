@@ -1,0 +1,22 @@
+<% content_for :title, "Database Check ##{@check_database_log.id}" %>
+<% content_for :page_title, "Database Check ##{@check_database_log.id}" %>
+
+<div class="max-w-2xl mx-auto space-y-6">
+  <div class="card">
+    <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wider mb-3">Check Details</h3>
+    <dl class="grid grid-cols-2 gap-3 text-sm">
+      <div>
+        <dt class="text-gray-500">ID</dt>
+        <dd class="font-medium text-gray-900 font-mono">#<%= @check_database_log.id %></dd>
+      </div>
+      <div>
+        <dt class="text-gray-500">Run At</dt>
+        <dd class="font-medium text-gray-900"><%= @check_database_log.created_at.strftime("%b %d, %Y %H:%M") %></dd>
+      </div>
+    </dl>
+  </div>
+
+  <div>
+    <%= link_to "Back to database checks", check_database_logs_path, class: "text-sm text-gray-600 hover:text-gray-900" %>
+  </div>
+</div>

@@ -1,24 +1,229 @@
-<% content_for :title, @preset.name %>
-<% content_for :page_title, @preset.name %>
+<% content_for :title, "Deck Options" %>
+<% content_for :page_title, "Deck Options" %>
+<% mock = mock_deck_options %>
+<% opts = mock[:current] %>
 
-<div class="space-y-6">
-  <%# Actions %>
-  <div class="flex items-center space-x-4">
-    <%= link_to "Edit this preset", edit_deck_options_preset_path(@preset), class: "btn-secondary" %>
-    <%= link_to "Back to presets", deck_options_presets_path, class: "text-gray-600 hover:text-gray-900" %>
-    <%= button_to "Destroy this preset", deck_options_preset_path(@preset), method: :delete, 
-        class: "btn-danger", 
-        data: { confirm: "Are you sure?" } %>
+<div class="max-w-3xl mx-auto space-y-6" data-controller="deck-options">
+  <%# Preset selector %>
+  <div class="flex items-center gap-3">
+    <select class="form-select w-auto" data-deck-options-target="presetSelect" data-action="change->deck-options#switchPreset">
+      <% mock[:presets].each do |preset| %>
+        <option value="<%= preset[:id] %>" <%= "selected" if preset[:id] == opts[:id] %>>
+          <%= preset[:name] %><%= " (default)" if preset[:is_default] %>
+        </option>
+      <% end %>
+    </select>
+    <div class="flex items-center gap-1">
+      <button class="btn-secondary text-xs px-3 py-1.5" data-action="click->deck-options#addPreset">Add</button>
+      <button class="btn-secondary text-xs px-3 py-1.5" data-action="click->deck-options#clonePreset">Clone</button>
+      <button class="btn-secondary text-xs px-3 py-1.5" data-action="click->deck-options#renamePreset">Rename</button>
+      <button class="btn-danger text-xs px-3 py-1.5" data-action="click->deck-options#removePreset">Remove</button>
+    </div>
   </div>
 
-  <%# Preset Details %>
-  <div class="card">
-    <h2 class="text-xl font-semibold text-gray-900 mb-4">Preset Details</h2>
-    <dl class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-      <div>
-        <dt class="text-sm font-medium text-gray-500">Name</dt>
-        <dd class="mt-1 text-sm text-gray-900"><%= @preset.name %></dd>
+  <%# Daily Limits %>
+  <div class="card" data-controller="collapsible" data-collapsible-open-value="true">
+    <div class="collapsible-header -mx-6 -mt-6 px-6 pt-4 pb-2" data-action="click->collapsible#toggle">
+      <h2 class="text-lg font-semibold text-gray-900">Daily Limits</h2>
+      <svg data-collapsible-target="icon" class="w-4 h-4 text-gray-400 transition-transform" style="transform: rotate(90deg)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+      </svg>
+    </div>
+    <div data-collapsible-target="content" class="space-y-4 mt-4">
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="form-label">New cards/day</label>
+          <input type="number" value="<%= opts[:daily_limits][:new_cards] %>" class="form-input">
+          <p class="text-xs text-gray-500 mt-1">Today: <%= opts[:daily_limits][:new_today] %></p>
+        </div>
+        <div>
+          <label class="form-label">Maximum reviews/day</label>
+          <input type="number" value="<%= opts[:daily_limits][:max_reviews] %>" class="form-input">
+          <p class="text-xs text-gray-500 mt-1">Today: <%= opts[:daily_limits][:reviews_today] %></p>
+        </div>
       </div>
-    </dl>
+    </div>
+  </div>
+
+  <%# New Cards %>
+  <div class="card" data-controller="collapsible" data-collapsible-open-value="true">
+    <div class="collapsible-header -mx-6 -mt-6 px-6 pt-4 pb-2" data-action="click->collapsible#toggle">
+      <h2 class="text-lg font-semibold text-gray-900">New Cards</h2>
+      <svg data-collapsible-target="icon" class="w-4 h-4 text-gray-400 transition-transform" style="transform: rotate(90deg)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+      </svg>
+    </div>
+    <div data-collapsible-target="content" class="space-y-4 mt-4">
+      <div>
+        <label class="form-label">Learning steps</label>
+        <input type="text" value="<%= opts[:new_cards][:learning_steps] %>" class="form-input" placeholder="1m 10m">
+        <p class="text-xs text-gray-500 mt-1">Steps in minutes (e.g., 1m 10m)</p>
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="form-label">Graduating interval</label>
+          <div class="flex items-center gap-2">
+            <input type="number" value="<%= opts[:new_cards][:graduating_interval] %>" class="form-input">
+            <span class="text-sm text-gray-500">days</span>
+          </div>
+        </div>
+        <div>
+          <label class="form-label">Easy interval</label>
+          <div class="flex items-center gap-2">
+            <input type="number" value="<%= opts[:new_cards][:easy_interval] %>" class="form-input">
+            <span class="text-sm text-gray-500">days</span>
+          </div>
+        </div>
+      </div>
+      <div>
+        <label class="form-label">Insertion order</label>
+        <select class="form-select">
+          <option selected>Sequential (oldest cards first)</option>
+          <option>Random</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <%# Lapses %>
+  <div class="card" data-controller="collapsible" data-collapsible-open-value="true">
+    <div class="collapsible-header -mx-6 -mt-6 px-6 pt-4 pb-2" data-action="click->collapsible#toggle">
+      <h2 class="text-lg font-semibold text-gray-900">Lapses</h2>
+      <svg data-collapsible-target="icon" class="w-4 h-4 text-gray-400 transition-transform" style="transform: rotate(90deg)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+      </svg>
+    </div>
+    <div data-collapsible-target="content" class="space-y-4 mt-4">
+      <div>
+        <label class="form-label">Relearning steps</label>
+        <input type="text" value="<%= opts[:lapses][:relearning_steps] %>" class="form-input" placeholder="10m">
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="form-label">Minimum interval</label>
+          <div class="flex items-center gap-2">
+            <input type="number" value="<%= opts[:lapses][:minimum_interval] %>" class="form-input">
+            <span class="text-sm text-gray-500">days</span>
+          </div>
+        </div>
+        <div>
+          <label class="form-label">Leech threshold</label>
+          <div class="flex items-center gap-2">
+            <input type="number" value="<%= opts[:lapses][:leech_threshold] %>" class="form-input">
+            <span class="text-sm text-gray-500">lapses</span>
+          </div>
+        </div>
+      </div>
+      <div>
+        <label class="form-label">Leech action</label>
+        <select class="form-select">
+          <option selected>Tag Only</option>
+          <option>Suspend Card</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <%# Display %>
+  <div class="card" data-controller="collapsible" data-collapsible-open-value="true">
+    <div class="collapsible-header -mx-6 -mt-6 px-6 pt-4 pb-2" data-action="click->collapsible#toggle">
+      <h2 class="text-lg font-semibold text-gray-900">Display</h2>
+      <svg data-collapsible-target="icon" class="w-4 h-4 text-gray-400 transition-transform" style="transform: rotate(90deg)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+      </svg>
+    </div>
+    <div data-collapsible-target="content" class="space-y-3 mt-4">
+      <label class="flex items-center gap-3 cursor-pointer">
+        <input type="checkbox" <%= "checked" if opts[:display][:show_timer] %> class="w-4 h-4 text-blue-600 border-gray-300 rounded">
+        <span class="text-sm text-gray-700">Show answer timer</span>
+      </label>
+      <label class="flex items-center gap-3 cursor-pointer">
+        <input type="checkbox" <%= "checked" if opts[:display][:autoplay_audio] %> class="w-4 h-4 text-blue-600 border-gray-300 rounded">
+        <span class="text-sm text-gray-700">Automatically play audio</span>
+      </label>
+      <label class="flex items-center gap-3 cursor-pointer">
+        <input type="checkbox" <%= "checked" if opts[:display][:auto_advance] %> class="w-4 h-4 text-blue-600 border-gray-300 rounded">
+        <span class="text-sm text-gray-700">Auto advance</span>
+      </label>
+      <div class="pl-7">
+        <label class="form-label">Wait time (seconds)</label>
+        <input type="number" value="<%= opts[:display][:auto_advance_seconds] %>" class="form-input w-32">
+      </div>
+    </div>
+  </div>
+
+  <%# Burying %>
+  <div class="card" data-controller="collapsible" data-collapsible-open-value="false">
+    <div class="collapsible-header -mx-6 -mt-6 px-6 pt-4 pb-2" data-action="click->collapsible#toggle">
+      <h2 class="text-lg font-semibold text-gray-900">Burying</h2>
+      <svg data-collapsible-target="icon" class="w-4 h-4 text-gray-400 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+      </svg>
+    </div>
+    <div data-collapsible-target="content" class="hidden space-y-3 mt-4">
+      <label class="flex items-center gap-3 cursor-pointer">
+        <input type="checkbox" <%= "checked" if opts[:burying][:bury_new_siblings] %> class="w-4 h-4 text-blue-600 border-gray-300 rounded">
+        <span class="text-sm text-gray-700">Bury new siblings of reviewed cards</span>
+      </label>
+      <label class="flex items-center gap-3 cursor-pointer">
+        <input type="checkbox" <%= "checked" if opts[:burying][:bury_review_siblings] %> class="w-4 h-4 text-blue-600 border-gray-300 rounded">
+        <span class="text-sm text-gray-700">Bury review siblings of new cards</span>
+      </label>
+      <label class="flex items-center gap-3 cursor-pointer">
+        <input type="checkbox" <%= "checked" if opts[:burying][:bury_interday_learning] %> class="w-4 h-4 text-blue-600 border-gray-300 rounded">
+        <span class="text-sm text-gray-700">Bury interday learning siblings</span>
+      </label>
+    </div>
+  </div>
+
+  <%# Advanced %>
+  <div class="card" data-controller="collapsible" data-collapsible-open-value="false">
+    <div class="collapsible-header -mx-6 -mt-6 px-6 pt-4 pb-2" data-action="click->collapsible#toggle">
+      <h2 class="text-lg font-semibold text-gray-900">Advanced</h2>
+      <svg data-collapsible-target="icon" class="w-4 h-4 text-gray-400 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+      </svg>
+    </div>
+    <div data-collapsible-target="content" class="hidden space-y-4 mt-4">
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="form-label">Maximum interval</label>
+          <div class="flex items-center gap-2">
+            <input type="number" value="<%= opts[:advanced][:maximum_interval] %>" class="form-input">
+            <span class="text-sm text-gray-500">days</span>
+          </div>
+        </div>
+        <div>
+          <label class="form-label">Starting ease</label>
+          <input type="number" value="<%= opts[:advanced][:starting_ease] %>" step="0.01" class="form-input">
+        </div>
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="form-label">Easy bonus</label>
+          <input type="number" value="<%= opts[:advanced][:easy_bonus] %>" step="0.01" class="form-input">
+        </div>
+        <div>
+          <label class="form-label">Interval modifier</label>
+          <input type="number" value="<%= opts[:advanced][:interval_modifier] %>" step="0.01" class="form-input">
+        </div>
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="form-label">Hard interval</label>
+          <input type="number" value="<%= opts[:advanced][:hard_interval] %>" step="0.01" class="form-input">
+        </div>
+        <div>
+          <label class="form-label">New interval</label>
+          <input type="number" value="<%= opts[:advanced][:new_interval] %>" step="0.01" class="form-input">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <%# Save/Revert footer %>
+  <div class="flex items-center justify-between pt-2">
+    <button class="btn-secondary" data-action="click->deck-options#revert">Revert</button>
+    <button class="btn-primary" data-action="click->deck-options#save">Save</button>
   </div>
 </div>

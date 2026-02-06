@@ -1,0 +1,98 @@
+<% content_for :title, "Backups" %>
+<% content_for :page_title, "Backups" %>
+<% filter = params[:type] || "all" %>
+
+<div class="max-w-4xl mx-auto space-y-6">
+  <%# Stats row %>
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+    <div class="stat-card text-center">
+      <p class="text-2xl font-bold text-gray-900"><%= @stats[:total_backups] %></p>
+      <p class="text-xs text-gray-500">Total Backups</p>
+    </div>
+    <div class="stat-card text-center">
+      <p class="text-2xl font-bold text-gray-900"><%= @stats[:total_size] %></p>
+      <p class="text-xs text-gray-500">Total Size</p>
+    </div>
+    <div class="stat-card text-center">
+      <p class="text-2xl font-bold text-gray-900"><%= @stats[:last_backup] %></p>
+      <p class="text-xs text-gray-500">Last Backup</p>
+    </div>
+    <div class="stat-card text-center">
+      <p class="text-2xl font-bold text-gray-900">
+        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium <%= @stats[:auto_backup] ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' %>">
+          <%= @stats[:auto_backup] ? "Enabled" : "Disabled" %>
+        </span>
+      </p>
+      <p class="text-xs text-gray-500">Auto Backup</p>
+    </div>
+  </div>
+
+  <%# Action bar %>
+  <div class="flex items-center justify-between flex-wrap gap-3">
+    <div class="flex items-center gap-1">
+      <%= link_to "All", backups_path(type: "all"), class: filter == "all" ? "pill-active" : "pill-inactive" %>
+      <%= link_to "Automatic", backups_path(type: "automatic"), class: filter == "automatic" ? "pill-active" : "pill-inactive" %>
+      <%= link_to "Manual", backups_path(type: "manual"), class: filter == "manual" ? "pill-active" : "pill-inactive" %>
+      <%= link_to "Pre-operation", backups_path(type: "pre_operation"), class: filter == "pre_operation" ? "pill-active" : "pill-inactive" %>
+    </div>
+
+    <%= button_to "Create Backup", backups_path, method: :post, class: "btn-primary inline-flex items-center gap-1.5" %>
+  </div>
+
+  <%# Backup list %>
+  <% filtered = filter == "all" ? @backups : @backups.select { |b| b[:type] == filter } %>
+
+  <% if filtered.any? %>
+    <div class="card p-0">
+      <div class="divide-y divide-gray-200">
+        <% filtered.each do |backup| %>
+          <div class="flex items-center justify-between px-4 py-3 hover:bg-gray-50 transition-colors group">
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-3">
+                <%# Backup icon %>
+                <svg class="w-5 h-5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/>
+                </svg>
+                <div>
+                  <h3 class="text-sm font-medium text-gray-900"><%= backup[:filename] %></h3>
+                  <p class="text-xs text-gray-500">
+                    <span class="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium
+                      <%= case backup[:type]
+                          when 'automatic' then 'bg-blue-100 text-blue-800'
+                          when 'manual' then 'bg-purple-100 text-purple-800'
+                          when 'pre_operation' then 'bg-orange-100 text-orange-800'
+                          else 'bg-gray-100 text-gray-800'
+                          end %>">
+                      <%= backup[:type].humanize %>
+                    </span>
+                    &middot;
+                    <%= "%.1f MB" % (backup[:size].to_f / 1_048_576) %>
+                    &middot;
+                    <%= backup[:created_at] %>
+                    &middot;
+                    <%= backup[:notes_count] %> notes, <%= backup[:cards_count] %> cards
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+              <%= link_to "View", backup_path(backup[:id]), class: "text-xs text-blue-600 hover:text-blue-700 font-medium" %>
+              <button class="text-xs text-gray-400 font-medium cursor-not-allowed" disabled>Download</button>
+              <%= button_to backup_path(backup[:id]), method: :delete, class: "text-xs text-red-500 hover:text-red-700 font-medium",
+                  data: { turbo_confirm: "Are you sure you want to delete this backup?" } do %>
+                Delete
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% else %>
+    <div class="card text-center py-12">
+      <svg class="w-12 h-12 text-gray-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/>
+      </svg>
+      <p class="text-gray-500">No backups found for this filter.</p>
+    </div>
+  <% end %>
+</div>

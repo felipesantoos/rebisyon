@@ -7,6 +7,7 @@ en:
     create_success: "%{resource} was successfully created"
     update_success: "%{resource} was successfully updated"
     delete_success: "%{resource} was successfully deleted"
+    destroy_success: "%{resource} was successfully deleted"
     
   dashboard:
     title: "Dashboard"
@@ -57,6 +58,22 @@ en:
       card: "Card"
       note_type: "Note Type"
       user_preference: "User Preference"
+      filtered_deck: "Filtered Deck"
+      backup: "Backup"
+      profile: "Profile"
+      shared_deck: "Shared Deck"
+      shared_deck_rating: "Rating"
+      add_on: "Add-on"
+      check_database_log: "Database Check"
+      deletion_log: "Deletion Log"
+      review: "Review"
+      medium: "Media"
+      flag_name: "Flag Name"
+      saved_search: "Saved Search"
+      browser_config: "Browser Config"
+      deck_options_preset: "Deck Options Preset"
+      sync_meta: "Sync Data"
+      undo_history: "Undo History"
     attributes:
       user:
         email: "Email"

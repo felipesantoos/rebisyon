@@ -1,33 +1,49 @@
-<% content_for :title, "Note types" %>
+<% content_for :title, "Note Types" %>
 <% content_for :page_title, "Note Types" %>
+<% mock = mock_note_types %>
 
-<div class="space-y-6">
+<div class="max-w-3xl mx-auto space-y-6">
+  <%# Action bar %>
   <div class="flex items-center justify-between">
-    <h1 class="text-2xl font-semibold text-gray-900">Note Types</h1>
-    <%= link_to "New note type", new_note_type_path, class: "btn-primary" %>
+    <p class="text-sm text-gray-500"><%= mock.size %> note types</p>
+    <div class="flex items-center gap-2">
+      <%= link_to new_note_type_path, class: "btn-primary inline-flex items-center gap-1.5" do %>
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+        </svg>
+        Add
+      <% end %>
+    </div>
   </div>
 
-  <div class="card">
-    <% if @note_types.empty? %>
-      <div class="text-center py-12">
-        <p class="text-gray-500 mb-4">No note types yet. Create your first note type to get started.</p>
-        <%= link_to "Create your first note type", new_note_type_path, class: "btn-primary inline-block" %>
-      </div>
-    <% else %>
-      <div class="space-y-2">
-        <% @note_types.each do |note_type| %>
-          <div class="flex items-center justify-between p-4 bg-gray-50 rounded-md hover:bg-gray-100 transition-colors">
-            <div>
-              <h3 class="text-lg font-medium text-gray-900"><%= note_type.name %></h3>
-              <p class="text-sm text-gray-500">
-                <%= pluralize(note_type.field_names.count, "field") %> • 
-                <%= pluralize(note_type.card_type_names.count, "card type") %>
-              </p>
+  <%# Note type list %>
+  <div class="card p-0">
+    <div class="divide-y divide-gray-200">
+      <% mock.each do |nt| %>
+        <div class="flex items-center justify-between px-4 py-3 hover:bg-gray-50 transition-colors group">
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-3">
+              <svg class="w-5 h-5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+              </svg>
+              <div>
+                <h3 class="text-sm font-medium text-gray-900"><%= nt[:name] %></h3>
+                <p class="text-xs text-gray-500">
+                  <%= pluralize(nt[:fields].size, "field") %> &middot;
+                  <%= pluralize(nt[:card_types].size, "card type") %> &middot;
+                  <%= pluralize(nt[:note_count], "note") %>
+                </p>
+              </div>
             </div>
-            <%= link_to "View", note_type_path(note_type), class: "text-blue-600 hover:text-blue-700 font-medium" %>
           </div>
-        <% end %>
-      </div>
-    <% end %>
+          <div class="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+            <a href="#" class="text-xs text-blue-600 hover:text-blue-700 font-medium">Fields</a>
+            <a href="#" class="text-xs text-blue-600 hover:text-blue-700 font-medium">Cards</a>
+            <button class="text-xs text-blue-600 hover:text-blue-700 font-medium">Rename</button>
+            <button class="text-xs text-gray-400 hover:text-red-600 font-medium">Delete</button>
+          </div>
+        </div>
+      <% end %>
+    </div>
   </div>
 </div>

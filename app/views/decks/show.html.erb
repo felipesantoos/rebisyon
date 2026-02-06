@@ -1,51 +1,97 @@
 <% content_for :title, @deck.name %>
-<% content_for :page_title, @deck.name %>
+<% content_for :page_title, @deck.full_name %>
+<% content_for :page_actions do %>
+  <%= link_to edit_deck_path(@deck), class: "btn-secondary inline-flex items-center gap-1.5" do %>
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+    </svg>
+    Options
+  <% end %>
+<% end %>
 
-<div class="space-y-6">
-  <%# Actions %>
-  <div class="flex items-center space-x-4">
-    <%= link_to "Edit this deck", edit_deck_path(@deck), class: "btn-secondary" %>
-    <%= link_to "Back to decks", decks_path, class: "text-gray-600 hover:text-gray-900" %>
-    <%= button_to "Destroy this deck", deck_path(@deck), method: :delete, 
-        class: "btn-danger", 
-        data: { confirm: "Are you sure?" } %>
+<div class="max-w-2xl mx-auto space-y-6">
+  <%# Card Counts %>
+  <div class="grid grid-cols-3 gap-4">
+    <div class="stat-card text-center">
+      <p class="text-3xl font-bold count-new">20</p>
+      <p class="text-sm text-gray-500 mt-1">New</p>
+    </div>
+    <div class="stat-card text-center">
+      <p class="text-3xl font-bold count-learning">5</p>
+      <p class="text-sm text-gray-500 mt-1">Learning</p>
+    </div>
+    <div class="stat-card text-center">
+      <p class="text-3xl font-bold count-review">30</p>
+      <p class="text-sm text-gray-500 mt-1">To Review</p>
+    </div>
   </div>
 
-  <%# Deck Details %>
+  <%# Study Now Button %>
+  <div class="text-center">
+    <%= link_to deck_study_session_path(@deck), class: "inline-flex items-center gap-2 bg-blue-600 text-white px-8 py-4 rounded-lg hover:bg-blue-700 transition-colors text-lg font-semibold shadow-md" do %>
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+      </svg>
+      Study Now
+    <% end %>
+  </div>
+
+  <%# Child Decks %>
+  <% unless @deck.children.empty? %>
+    <div class="card p-0">
+      <div class="px-4 py-3 border-b border-gray-200">
+        <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wider">Subdecks</h3>
+      </div>
+      <table class="w-full">
+        <tbody>
+          <% @deck.children.each do |child| %>
+            <tr class="deck-row border-b border-gray-100 last:border-0">
+              <td class="py-2 px-4">
+                <%= link_to child.name, deck_path(child), class: "text-sm text-gray-900 hover:text-blue-600 font-medium" %>
+              </td>
+              <td class="py-2 px-3 text-right w-16">
+                <span class="count-new text-sm font-semibold">0</span>
+              </td>
+              <td class="py-2 px-3 text-right w-16">
+                <span class="count-learning text-sm font-semibold">0</span>
+              </td>
+              <td class="py-2 px-3 text-right w-16">
+                <span class="count-review text-sm font-semibold">0</span>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% end %>
+
+  <%# Deck Info %>
   <div class="card">
-    <h2 class="text-xl font-semibold text-gray-900 mb-4">Deck Details</h2>
-    <dl class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+    <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wider mb-3">Deck Info</h3>
+    <dl class="grid grid-cols-2 gap-3 text-sm">
       <div>
-        <dt class="text-sm font-medium text-gray-500">Name</dt>
-        <dd class="mt-1 text-sm text-gray-900"><%= @deck.name %></dd>
+        <dt class="text-gray-500">Total cards</dt>
+        <dd class="font-medium text-gray-900">150</dd>
       </div>
       <div>
-        <dt class="text-sm font-medium text-gray-500">Full Name</dt>
-        <dd class="mt-1 text-sm text-gray-900"><%= @deck.full_name %></dd>
+        <dt class="text-gray-500">Options preset</dt>
+        <dd class="font-medium text-gray-900">Default</dd>
       </div>
       <% if @deck.parent %>
         <div>
-          <dt class="text-sm font-medium text-gray-500">Parent</dt>
-          <dd class="mt-1 text-sm text-gray-900">
-            <%= link_to @deck.parent.name, deck_path(@deck.parent), class: "text-blue-600 hover:text-blue-700" %>
-          </dd>
+          <dt class="text-gray-500">Parent deck</dt>
+          <dd><%= link_to @deck.parent.name, deck_path(@deck.parent), class: "text-blue-600 hover:text-blue-700 font-medium" %></dd>
         </div>
       <% end %>
     </dl>
   </div>
 
-  <%# Children Decks %>
-  <% unless @deck.children.empty? %>
-    <div class="card">
-      <h2 class="text-xl font-semibold text-gray-900 mb-4">Child Decks</h2>
-      <div class="space-y-2">
-        <% @deck.children.each do |child| %>
-          <div class="flex items-center justify-between p-3 bg-gray-50 rounded-md">
-            <span class="text-gray-900"><%= child.name %></span>
-            <%= link_to "View", deck_path(child), class: "text-blue-600 hover:text-blue-700 text-sm font-medium" %>
-          </div>
-        <% end %>
-      </div>
-    </div>
-  <% end %>
+  <%# Actions %>
+  <div class="flex items-center justify-between">
+    <%= link_to "Back to decks", decks_path, class: "text-sm text-gray-600 hover:text-gray-900" %>
+    <%= button_to "Delete deck", deck_path(@deck), method: :delete,
+        class: "text-sm text-red-600 hover:text-red-700",
+        data: { confirm: "Are you sure you want to delete this deck and all its cards?" } %>
+  </div>
 </div>

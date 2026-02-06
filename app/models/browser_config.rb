@@ -5,9 +5,6 @@ class BrowserConfig < ApplicationRecord
 
   include UserScoped
 
-  # JSONB accessor for column_widths
-  store_accessor :column_widths
-
   # Validations
   validates :visible_columns, presence: true
   validates :sort_direction, inclusion: { in: %w[asc desc] }

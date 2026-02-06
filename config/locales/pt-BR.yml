@@ -7,6 +7,7 @@ pt-BR:
     create_success: "%{resource} foi criado(a) com sucesso"
     update_success: "%{resource} foi atualizado(a) com sucesso"
     delete_success: "%{resource} foi excluído(a) com sucesso"
+    destroy_success: "%{resource} foi excluído(a) com sucesso"
     
   dashboard:
     title: "Painel"
@@ -57,6 +58,22 @@ pt-BR:
       card: "Card"
       note_type: "Tipo de Nota"
       user_preference: "Preferência do Usuário"
+      filtered_deck: "Baralho Filtrado"
+      backup: "Backup"
+      profile: "Perfil"
+      shared_deck: "Baralho Compartilhado"
+      shared_deck_rating: "Avaliação"
+      add_on: "Extensão"
+      check_database_log: "Verificação do Banco"
+      deletion_log: "Log de Exclusão"
+      review: "Revisão"
+      medium: "Mídia"
+      flag_name: "Nome da Bandeira"
+      saved_search: "Pesquisa Salva"
+      browser_config: "Configuração do Navegador"
+      deck_options_preset: "Preset de Opções"
+      sync_meta: "Dados de Sincronização"
+      undo_history: "Histórico de Desfazer"
     attributes:
       user:
         email: "E-mail"

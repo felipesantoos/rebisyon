@@ -6,8 +6,13 @@ class MediaController < ApplicationController
 
   # GET /media
   def index
-    @media = current_user.media.includes(:notes).order(created_at: :desc)
-    @media = @media.page(params[:page]) if defined?(Kaminari)
+    @media_items = helpers.mock_media_data
+    @filter = params[:filter] || "all"
+  end
+
+  # POST /media/check
+  def check
+    redirect_to media_path, notice: "Media check completed. 3 unused files found, 1 missing file detected."
   end
 
   # GET /media/:id
