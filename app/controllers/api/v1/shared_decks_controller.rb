@@ -42,7 +42,7 @@ module Api
       def set_shared_deck
         case action_name
         when "show"
-          @shared_deck = SharedDeck.find(params[:id])
+          @shared_deck = SharedDeck.public_decks.find(params[:id])
         else
           @shared_deck = current_user.shared_decks.find(params[:id])
         end

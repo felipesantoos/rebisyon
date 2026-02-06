@@ -1,11 +1,13 @@
 # frozen_string_literal: true
 
 class FilteredDecksController < ApplicationController
+  include Paginatable
+
   before_action :authenticate_user!
   before_action :set_filtered_deck, only: %i[show edit update destroy]
 
   def index
-    @filtered_decks = current_user.filtered_decks.ordered
+    @pagy, @filtered_decks = paginate(current_user.filtered_decks.ordered)
   end
 
   def show

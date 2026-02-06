@@ -24,7 +24,7 @@ RSpec.describe NoteType, type: :model do
 
     it "supports soft delete" do
       note_type.soft_delete!
-      expect(note_type.deleted?).to be true
+      expect(note_type.soft_deleted?).to be true
       expect(NoteType.where(id: note_type.id)).to be_empty
     end
   end

@@ -6,14 +6,18 @@ module DeckTreeBuilder
   private
 
   # Builds a hierarchical deck tree from the user's root decks.
-  # Each node includes card counts computed via PostgreSQL functions.
+  # Loads all decks in a single query and builds the tree in memory
+  # to avoid N+1 queries on children.
   # @param user [User]
   # @return [Array<Hash>]
   def build_deck_tree(user)
-    decks = user.decks.where(deleted_at: nil).includes(:children).order(:name)
-    roots = decks.select(&:root?)
+    decks = user.decks.where(deleted_at: nil).order(:name).to_a
 
-    # Preload card counts per deck using the database view
+    # Build a lookup of children by parent_id in memory
+    children_by_parent = decks.group_by(&:parent_id)
+    roots = children_by_parent[nil] || []
+
+    # Preload card counts per deck in a single query
     card_counts = Card.joins(:deck)
                       .where(decks: { user_id: user.id })
                       .where(suspended: false, buried: false)
@@ -26,16 +30,19 @@ module DeckTreeBuilder
                         "COUNT(*) AS total_count"
                       ).index_by(&:deck_id)
 
-    roots.map { |deck| build_deck_node(deck, card_counts, 0) }
+    roots.map { |deck| build_deck_node(deck, card_counts, children_by_parent, 0) }
   end
 
   # Recursively builds a deck node hash with counts rolled up from children.
+  # Uses the in-memory children lookup instead of querying the database.
   # @param deck [Deck]
   # @param card_counts [Hash<Integer, Object>]
+  # @param children_by_parent [Hash<Integer, Array<Deck>>]
   # @param depth [Integer]
   # @return [Hash]
-  def build_deck_node(deck, card_counts, depth)
-    children_nodes = deck.children.order(:name).map { |child| build_deck_node(child, card_counts, depth + 1) }
+  def build_deck_node(deck, card_counts, children_by_parent, depth)
+    children = children_by_parent[deck.id] || []
+    children_nodes = children.map { |child| build_deck_node(child, card_counts, children_by_parent, depth + 1) }
 
     counts = card_counts[deck.id]
     own_new   = counts&.new_count.to_i

@@ -1,12 +1,14 @@
 # frozen_string_literal: true
 
 class SavedSearchesController < ApplicationController
+  include Paginatable
+
   before_action :authenticate_user!
   before_action :set_saved_search, only: %i[edit update destroy]
 
   # GET /saved_searches
   def index
-    @saved_searches = current_user.saved_searches.ordered
+    @pagy, @saved_searches = paginate(current_user.saved_searches.ordered)
   end
 
   # GET /saved_searches/new

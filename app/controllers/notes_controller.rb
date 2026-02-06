@@ -10,11 +10,11 @@ class NotesController < ApplicationController
     
     # Search filtering
     if params[:search].present?
-      search_term = params[:search].strip
+      search_term = "%#{ActiveRecord::Base.sanitize_sql_like(params[:search].strip)}%"
       @notes = @notes.where(
         "fields_json::text ILIKE ? OR tags::text ILIKE ?",
-        "%#{search_term}%",
-        "%#{search_term}%"
+        search_term,
+        search_term
       )
     end
 

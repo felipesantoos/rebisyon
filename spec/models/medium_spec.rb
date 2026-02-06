@@ -41,7 +41,7 @@ RSpec.describe Medium, type: :model do
 
     it "supports soft delete" do
       medium.soft_delete!
-      expect(medium.deleted?).to be true
+      expect(medium.soft_deleted?).to be true
       expect(Medium.where(id: medium.id)).to be_empty
     end
   end

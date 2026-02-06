@@ -1,11 +1,13 @@
 # frozen_string_literal: true
 
 class ProfilesController < ApplicationController
+  include Paginatable
+
   before_action :authenticate_user!
   before_action :set_profile, only: %i[show edit update destroy]
 
   def index
-    @profiles = current_user.profiles.ordered
+    @pagy, @profiles = paginate(current_user.profiles.ordered)
   end
 
   def show

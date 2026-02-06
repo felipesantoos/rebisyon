@@ -1,13 +1,11 @@
 # frozen_string_literal: true
 
 class ReviewsController < ApplicationController
-  include Pagy::Backend
-
   before_action :authenticate_user!
 
   def index
-    reviews = Review.joins(card: :deck)
-                    .where(decks: { user_id: current_user.id })
+    reviews = Review.joins(card: :note)
+                    .where(notes: { user_id: current_user.id })
                     .includes(card: [:deck, :note])
                     .order(created_at: :desc)
 

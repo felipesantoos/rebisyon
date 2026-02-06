@@ -7,6 +7,14 @@ module Api
 
       skip_before_action :verify_authenticity_token
 
+      rescue_from ActiveRecord::RecordNotFound do |e|
+        render json: { error: "Record not found", message: e.message }, status: :not_found
+      end
+
+      rescue_from ActionController::ParameterMissing do |e|
+        render json: { error: "Missing parameter", message: e.message }, status: :bad_request
+      end
+
       private
 
       def respond_with(resource, _opts = {})

@@ -21,14 +21,14 @@ RSpec.describe SavedSearch, type: :model do
 
     it "supports soft delete" do
       search.soft_delete!
-      expect(search.deleted?).to be true
+      expect(search.soft_deleted?).to be true
       expect(SavedSearch.where(id: search.id)).to be_empty
     end
 
     it "can be restored" do
       search.soft_delete!
       search.restore!
-      expect(search.deleted?).to be false
+      expect(search.soft_deleted?).to be false
     end
   end
 

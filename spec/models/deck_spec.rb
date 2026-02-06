@@ -47,14 +47,14 @@ RSpec.describe Deck, type: :model do
 
     it "supports soft delete" do
       deck.soft_delete!
-      expect(deck.deleted?).to be true
+      expect(deck.soft_deleted?).to be true
       expect(Deck.where(id: deck.id)).to be_empty
     end
 
     it "can be restored" do
       deck.soft_delete!
       deck.restore!
-      expect(deck.deleted?).to be false
+      expect(deck.soft_deleted?).to be false
     end
   end
 

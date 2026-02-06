@@ -35,7 +35,7 @@ module Api
       private
 
       def set_shared_deck
-        @shared_deck = SharedDeck.find(params[:shared_deck_id])
+        @shared_deck = SharedDeck.public_decks.find(params[:shared_deck_id])
       end
 
       def set_rating

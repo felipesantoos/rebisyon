@@ -1,12 +1,14 @@
 # frozen_string_literal: true
 
 class NoteTypesController < ApplicationController
+  include Paginatable
+
   before_action :authenticate_user!
   before_action :set_note_type, only: %i[show edit update destroy]
 
   # GET /note_types
   def index
-    @note_types = current_user.note_types.ordered
+    @pagy, @note_types = paginate(current_user.note_types.ordered)
   end
 
   # GET /note_types/:id

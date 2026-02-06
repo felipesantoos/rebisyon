@@ -20,14 +20,14 @@ RSpec.describe DeckOptionsPreset, type: :model do
 
     it "supports soft delete" do
       preset.soft_delete!
-      expect(preset.deleted?).to be true
+      expect(preset.soft_deleted?).to be true
       expect(DeckOptionsPreset.where(id: preset.id)).to be_empty
     end
 
     it "can be restored" do
       preset.soft_delete!
       preset.restore!
-      expect(preset.deleted?).to be false
+      expect(preset.soft_deleted?).to be false
     end
   end
 

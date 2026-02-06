@@ -8,7 +8,7 @@
 # - restore! method to undelete a record
 # - with_deleted scope to include deleted records
 # - only_deleted scope to only show deleted records
-# - deleted? predicate method
+# - soft_deleted? predicate method
 #
 # @example
 #   class Note < ApplicationRecord
@@ -16,7 +16,7 @@
 #   end
 #
 #   note.soft_delete!  # Sets deleted_at to current time
-#   note.deleted?      # => true
+#   note.soft_deleted?  # => true
 #   note.restore!      # Clears deleted_at
 #   Note.with_deleted  # Returns all records including deleted
 #   Note.only_deleted  # Returns only deleted records
@@ -45,26 +45,19 @@ module SoftDeletable
   # Soft deletes the record by setting deleted_at timestamp
   # @return [Boolean] true if update was successful
   def soft_delete!
-    update_column(:deleted_at, Time.current)
+    update!(deleted_at: Time.current)
   end
 
   # Restores a soft-deleted record
   # @return [Boolean] true if update was successful
   def restore!
-    # Clear the deleted_at in-memory first so ActiveRecord doesn't think it's destroyed
-    self.deleted_at = nil
-    self.class.unscoped.where(id: id).update_all(deleted_at: nil)
+    self.class.unscoped.where(id: id).update_all(deleted_at: nil, updated_at: Time.current)
     reload
   end
 
   # Checks if the record has been soft-deleted
   # @return [Boolean]
-  def deleted?
+  def soft_deleted?
     deleted_at.present?
-  end
-
-  # Alias for deleted? following Rails conventions
-  def destroyed?
-    deleted?
   end
 end

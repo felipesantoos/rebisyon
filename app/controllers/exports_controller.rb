@@ -7,6 +7,6 @@ class ExportsController < ApplicationController
   end
 
   def create
-    redirect_to root_path, notice: "Export started."
+    redirect_to root_path, alert: "Export is not yet implemented."
   end
 end

@@ -7,7 +7,7 @@ FactoryBot.define do
     interval { 1 }
     ease { 2500 }
     time_ms { 5000 }
-    review_type { :learn }
+    type { :learn }
 
     trait :again do
       rating { 1 }
@@ -26,7 +26,7 @@ FactoryBot.define do
     end
 
     trait :review_type do
-      review_type { :review }
+      type { :review }
     end
   end
 end

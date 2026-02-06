@@ -37,7 +37,8 @@ module Api
           "video/mp4", "video/webm"
         ]
 
-        unless allowed_mime_types.include?(uploaded_file.content_type)
+        detected_type = Marcel::MimeType.for(uploaded_file.tempfile, name: uploaded_file.original_filename)
+        unless allowed_mime_types.include?(detected_type)
           render json: { error: "File type not supported" }, status: :bad_request
           return
         end
@@ -54,17 +55,19 @@ module Api
           filename: uploaded_file.original_filename,
           hash: file_hash,
           size: uploaded_file.size,
-          mime_type: uploaded_file.content_type,
+          mime_type: detected_type,
           storage_path: ""
         )
         medium.save!
 
-        if medium.respond_to?(:file)
-          medium.file.attach(
-            io: uploaded_file,
-            filename: uploaded_file.original_filename,
-            content_type: uploaded_file.content_type
-          )
+        medium.file.attach(
+          io: uploaded_file,
+          filename: uploaded_file.original_filename,
+          content_type: detected_type
+        )
+
+        if medium.file.attached?
+          medium.update_column(:storage_path, ActiveStorage::Blob.service.path_for(medium.file.key))
         end
 
         render json: { data: medium }, status: :created

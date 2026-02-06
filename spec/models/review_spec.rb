@@ -16,12 +16,12 @@ RSpec.describe Review, type: :model do
     it { should validate_presence_of(:ease) }
     it { should validate_presence_of(:time_ms) }
     it { should validate_numericality_of(:time_ms).is_greater_than(0) }
-    it { should validate_presence_of(:review_type) }
+    it { should validate_presence_of(:type) }
   end
 
   describe "enums" do
-    it "defines review_type enum" do
-      expect(Review.review_types).to eq(
+    it "defines type enum" do
+      expect(Review.types).to eq(
         "learn" => "learn",
         "review" => "review",
         "relearn" => "relearn",

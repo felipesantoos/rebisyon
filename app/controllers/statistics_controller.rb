@@ -35,8 +35,8 @@ class StatisticsController < ApplicationController
   # Reviews per day (bar chart)
   # @return [Hash] Data for chartkick
   def reviews_per_day_data
-    Review.joins(card: :deck)
-          .where(decks: { user_id: current_user.id })
+    Review.joins(card: :note)
+          .where(notes: { user_id: current_user.id })
           .where(reviews: { created_at: @period_start..@period_end })
           .group_by_period(@period, "reviews.created_at", format: "%b %d")
           .count
@@ -45,8 +45,8 @@ class StatisticsController < ApplicationController
   # Review time per day (line chart)
   # @return [Hash] Data for chartkick
   def review_time_per_day_data
-    Review.joins(card: :deck)
-          .where(decks: { user_id: current_user.id })
+    Review.joins(card: :note)
+          .where(notes: { user_id: current_user.id })
           .where(reviews: { created_at: @period_start..@period_end })
           .group_by_period(@period, "reviews.created_at", format: "%b %d")
           .sum("reviews.time_ms")
@@ -58,8 +58,8 @@ class StatisticsController < ApplicationController
   def retention_rate_data
     # Group reviews by interval (maturity) and calculate % correct (rating >= 3)
     # Note: Using string 'review' because PostgreSQL enum types are string-based
-    reviews = Review.joins(card: :deck)
-                    .where(decks: { user_id: current_user.id })
+    reviews = Review.joins(card: :note)
+                    .where(notes: { user_id: current_user.id })
                     .where(reviews: { created_at: @period_start..@period_end })
                     .where(review_type: :review) # Only review cards, not learning
 
@@ -106,36 +106,44 @@ class StatisticsController < ApplicationController
     end
   end
 
-  # Interval distribution (histogram)
+  # Interval distribution (histogram) — computed in SQL to avoid loading all intervals into memory
   # @return [Hash] Data for chartkick
   def interval_distribution_data
-    intervals = Review.joins(card: :deck)
-                      .where(decks: { user_id: current_user.id })
-                      .where(reviews: { created_at: @period_start..@period_end })
-                      .where(review_type: :review) # Use enum value
-                      .pluck("reviews.interval")
-
-    # Create bins for histogram
     bins = [[1, 1], [2, 7], [8, 14], [15, 30], [31, 60], [61, 90], [91, 180], [181, 365], [366, 730], [731, nil]]
-    distribution = bins.map do |min, max|
-      if max.nil?
-        count = intervals.count { |i| i >= min }
-        label = "#{min}+ days"
-      else
-        count = intervals.count { |i| i >= min && i <= max }
-        label = min == max ? "#{min} day" : "#{min}-#{max} days"
-      end
-      [label, count]
-    end.to_h
 
-    distribution
+    case_sql = "CASE " + bins.map.with_index do |(min, max), i|
+      if max.nil?
+        "WHEN reviews.interval >= #{min} THEN #{i}"
+      else
+        "WHEN reviews.interval BETWEEN #{min} AND #{max} THEN #{i}"
+      end
+    end.join(" ") + " END"
+
+    counts_by_bin = Review.joins(card: :note)
+                          .where(notes: { user_id: current_user.id })
+                          .where(reviews: { created_at: @period_start..@period_end })
+                          .where(review_type: :review)
+                          .where("reviews.interval >= 1")
+                          .group(Arel.sql(case_sql))
+                          .count
+
+    bins.each_with_index.map do |(min, max), i|
+      label = if max.nil?
+                "#{min}+ days"
+              elsif min == max
+                "#{min} day"
+              else
+                "#{min}-#{max} days"
+              end
+      [label, counts_by_bin[i] || 0]
+    end.to_h
   end
 
   # Card state breakdown (pie chart)
   # @return [Hash] Data for chartkick
   def card_state_breakdown_data
-    Card.joins(:deck)
-        .where(decks: { user_id: current_user.id })
+    Card.joins(:note)
+        .where(notes: { user_id: current_user.id })
         .where(suspended: false, buried: false)
         .group(:state)
         .count
@@ -145,8 +153,8 @@ class StatisticsController < ApplicationController
   # Hourly breakdown (when you study)
   # @return [Hash] Data for chartkick
   def hourly_breakdown_data
-    Review.joins(card: :deck)
-          .where(decks: { user_id: current_user.id })
+    Review.joins(card: :note)
+          .where(notes: { user_id: current_user.id })
           .where(reviews: { created_at: @period_start..@period_end })
           .group("EXTRACT(HOUR FROM reviews.created_at)")
           .count
@@ -155,20 +163,55 @@ class StatisticsController < ApplicationController
           .to_h
   end
 
-  # Deck overview with card counts
+  # Deck overview with card counts — uses SQL aggregation instead of loading all cards
   # @return [Array<Hash>]
   def deck_overview_data
-    current_user.decks.roots.map do |deck|
-      all_cards = deck.cards + deck.descendants.flat_map(&:cards)
+    root_decks = current_user.decks.roots.to_a
+    return [] if root_decks.empty?
+
+    # Build a mapping of root deck -> all descendant deck IDs (including self)
+    all_decks = current_user.decks.where(deleted_at: nil).pluck(:id, :parent_id)
+    children_map = all_decks.group_by(&:last).transform_values { |pairs| pairs.map(&:first) }
+
+    deck_id_groups = root_decks.map do |deck|
+      ids = [deck.id]
+      queue = [deck.id]
+      while (current_id = queue.shift)
+        child_ids = children_map[current_id] || []
+        ids.concat(child_ids)
+        queue.concat(child_ids)
+      end
+      [deck.id, ids]
+    end.to_h
+
+    # Single query to get counts per deck_id
+    all_deck_ids = deck_id_groups.values.flatten.uniq
+    counts = Card.where(deck_id: all_deck_ids)
+                 .group(:deck_id)
+                 .select(
+                   "deck_id",
+                   "COUNT(*) AS total_count",
+                   "COUNT(*) FILTER (WHERE state = 'new') AS new_count",
+                   "COUNT(*) FILTER (WHERE state = 'learn') AS learn_count",
+                   "COUNT(*) FILTER (WHERE state = 'review') AS review_count",
+                   "COUNT(*) FILTER (WHERE state = 'relearn') AS relearn_count",
+                   "COUNT(*) FILTER (WHERE suspended = true) AS suspended_count",
+                   "COUNT(*) FILTER (WHERE buried = true) AS buried_count"
+                 ).index_by(&:deck_id)
+
+    root_decks.map do |deck|
+      group_ids = deck_id_groups[deck.id]
+      group_counts = group_ids.filter_map { |id| counts[id] }
+
       {
         deck: deck,
-        total_cards: all_cards.count,
-        new_cards: all_cards.count { |c| c.state == "new" },
-        learning_cards: all_cards.count { |c| c.state == "learn" },
-        review_cards: all_cards.count { |c| c.state == "review" },
-        relearn_cards: all_cards.count { |c| c.state == "relearn" },
-        suspended_cards: all_cards.count(&:suspended),
-        buried_cards: all_cards.count(&:buried)
+        total_cards: group_counts.sum { |c| c.total_count.to_i },
+        new_cards: group_counts.sum { |c| c.new_count.to_i },
+        learning_cards: group_counts.sum { |c| c.learn_count.to_i },
+        review_cards: group_counts.sum { |c| c.review_count.to_i },
+        relearn_cards: group_counts.sum { |c| c.relearn_count.to_i },
+        suspended_cards: group_counts.sum { |c| c.suspended_count.to_i },
+        buried_cards: group_counts.sum { |c| c.buried_count.to_i }
       }
     end
   end
@@ -176,8 +219,8 @@ class StatisticsController < ApplicationController
   # Today's study statistics
   # @return [Hash]
   def today_stats_data
-    today_reviews = Review.joins(card: :deck)
-                          .where(decks: { user_id: current_user.id })
+    today_reviews = Review.joins(card: :note)
+                          .where(notes: { user_id: current_user.id })
                           .where(reviews: { created_at: Time.current.beginning_of_day..Time.current })
 
     total = today_reviews.count

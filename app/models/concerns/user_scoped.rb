@@ -19,9 +19,6 @@ module UserScoped
     belongs_to :user
 
     # Scope to filter records by user
-    scope :for_user, ->(user) { where(user_id: user.id) }
-
-    # Validates user presence
-    validates :user, presence: true
+    scope :for_user, ->(user) { where(user: user) }
   end
 end

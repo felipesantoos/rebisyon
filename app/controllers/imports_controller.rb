@@ -7,6 +7,6 @@ class ImportsController < ApplicationController
   end
 
   def create
-    redirect_to root_path, notice: "Import started."
+    redirect_to root_path, alert: "Import is not yet implemented."
   end
 end

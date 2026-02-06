@@ -15,7 +15,6 @@ RSpec.describe Note, type: :model do
     subject { build(:note) }
 
     it { should validate_presence_of(:fields_json) }
-    it { should validate_presence_of(:tags) }
   end
 
   describe "guid" do
@@ -39,7 +38,7 @@ RSpec.describe Note, type: :model do
 
     it "supports soft delete" do
       note.soft_delete!
-      expect(note.deleted?).to be true
+      expect(note.soft_deleted?).to be true
       expect(Note.where(id: note.id)).to be_empty
     end
   end

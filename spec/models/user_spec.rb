@@ -24,7 +24,7 @@ RSpec.describe User, type: :model do
 
     it "supports soft delete" do
       user.soft_delete!
-      expect(user.deleted?).to be true
+      expect(user.soft_deleted?).to be true
       expect(user.deleted_at).to be_present
     end
 
@@ -41,7 +41,7 @@ RSpec.describe User, type: :model do
     it "can restore soft-deleted users" do
       user.soft_delete!
       user.restore!
-      expect(user.deleted?).to be false
+      expect(user.soft_deleted?).to be false
       expect(User.where(id: user.id)).to exist
     end
   end

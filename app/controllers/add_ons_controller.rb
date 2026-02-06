@@ -1,11 +1,13 @@
 # frozen_string_literal: true
 
 class AddOnsController < ApplicationController
+  include Paginatable
+
   before_action :authenticate_user!
   before_action :set_add_on, only: %i[show update destroy]
 
   def index
-    @add_ons = current_user.add_ons.order(:name)
+    @pagy, @add_ons = paginate(current_user.add_ons.order(:name))
   end
 
   def show

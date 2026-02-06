@@ -42,7 +42,7 @@ class SharedDeckRatingsController < ApplicationController
   end
 
   def rating_params
-    params.require(:rating).permit(:rating, :comment)
+    params.require(:shared_deck_rating).permit(:rating, :comment)
   end
 
   def recalculate_average

@@ -1,12 +1,14 @@
 # frozen_string_literal: true
 
 class CheckDatabaseLogsController < ApplicationController
+  include Paginatable
+
   before_action :authenticate_user!
   before_action :set_check_database_log, only: :show
 
   # GET /check_database_logs
   def index
-    @check_database_logs = current_user.check_database_logs.recent
+    @pagy, @check_database_logs = paginate(current_user.check_database_logs.recent)
   end
 
   # GET /check_database_logs/:id

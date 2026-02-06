@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class MediaController < ApplicationController
-  include Pagy::Backend
-
   before_action :authenticate_user!
   before_action :set_medium, only: %i[show destroy]
 
@@ -49,7 +47,8 @@ class MediaController < ApplicationController
       "audio/mpeg", "audio/ogg", "audio/wav",
       "video/mp4", "video/webm"
     ]
-    unless allowed_mime_types.include?(uploaded_file.content_type)
+    detected_type = Marcel::MimeType.for(uploaded_file.tempfile, name: uploaded_file.original_filename)
+    unless allowed_mime_types.include?(detected_type)
       render json: { error: "File type not supported" }, status: :bad_request
       return
     end
@@ -66,12 +65,12 @@ class MediaController < ApplicationController
       filename: uploaded_file.original_filename,
       hash: file_hash,
       size: uploaded_file.size,
-      mime_type: uploaded_file.content_type,
+      mime_type: detected_type,
       storage_path: ""
     )
 
     if @medium.save
-      @medium.file.attach(io: uploaded_file, filename: uploaded_file.original_filename, content_type: uploaded_file.content_type)
+      @medium.file.attach(io: uploaded_file, filename: uploaded_file.original_filename, content_type: detected_type)
       if @medium.file.attached?
         @medium.update_column(:storage_path, ActiveStorage::Blob.service.path_for(@medium.file.key))
       end

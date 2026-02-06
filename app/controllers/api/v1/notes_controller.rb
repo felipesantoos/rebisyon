@@ -34,8 +34,12 @@ module Api
         current_user.deletion_logs.create!(
           object_type: "note",
           object_id: @note.id,
-          deleted_at: Time.current,
-          object_data: @note.as_json
+          object_data: {
+            guid: @note.guid,
+            note_type_id: @note.note_type_id,
+            fields_json: @note.fields_json,
+            tags: @note.tags
+          }
         )
         @note.soft_delete!
         head :no_content

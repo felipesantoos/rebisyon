@@ -36,7 +36,7 @@ module Api
       end
 
       def backup_params
-        params.require(:backup).permit(:filename, :size, :storage_path, :backup_type)
+        params.require(:backup).permit(:filename, :backup_type)
       end
     end
   end

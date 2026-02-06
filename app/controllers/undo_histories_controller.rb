@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class UndoHistoriesController < ApplicationController
-  include Pagy::Backend
-
   before_action :authenticate_user!
   before_action :set_entry, only: :show
 

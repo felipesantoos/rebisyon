@@ -14,7 +14,7 @@ class SharedDecksController < ApplicationController
     scope = scope.where(category: params[:category]) if params[:category].present?
 
     # Search
-    scope = scope.where("name ILIKE ?", "%#{params[:q]}%") if params[:q].present?
+    scope = scope.where("name ILIKE ?", "%#{ActiveRecord::Base.sanitize_sql_like(params[:q])}%") if params[:q].present?
 
     # Sort
     scope = case params[:sort]
@@ -27,7 +27,7 @@ class SharedDecksController < ApplicationController
   end
 
   def show
-    @shared_deck = SharedDeck.find(params[:id])
+    @shared_deck = SharedDeck.public_decks.find(params[:id])
     @ratings = @shared_deck.shared_deck_ratings.includes(:user).order(created_at: :desc)
   end
 
@@ -59,7 +59,7 @@ class SharedDecksController < ApplicationController
   end
 
   def destroy
-    @shared_deck.destroy
+    @shared_deck.soft_delete!
     redirect_to shared_decks_path, notice: "Shared deck deleted."
   end
 

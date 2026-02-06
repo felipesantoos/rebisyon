@@ -1,12 +1,14 @@
 # frozen_string_literal: true
 
 class DeckOptionsPresetsController < ApplicationController
+  include Paginatable
+
   before_action :authenticate_user!
   before_action :set_preset, only: %i[show edit update destroy]
 
   # GET /deck_options_presets
   def index
-    @presets = current_user.deck_options_presets.ordered
+    @pagy, @presets = paginate(current_user.deck_options_presets.ordered)
   end
 
   # GET /deck_options_presets/:id
