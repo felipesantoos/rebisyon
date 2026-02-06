@@ -45,6 +45,15 @@ class StudySessionsController < ApplicationController
       return
     end
 
+    # Snapshot card state for undo before processing
+    session[:last_answer_undo] = {
+      card_id: @card.id,
+      attributes: @card.attributes.slice(
+        "state", "due", "interval", "ease", "lapses", "reps",
+        "position", "flag", "suspended", "buried"
+      )
+    }
+
     # Process the answer
     result = @session_manager.answer_card(@card, rating: rating, time_ms: time_ms)
     @next_card = @session_manager.next_card
@@ -64,9 +73,27 @@ class StudySessionsController < ApplicationController
 
   # POST /decks/:deck_id/study/undo
   def undo
-    # TODO: Implement undo functionality (Phase 4+)
-    # This would require storing undo history
-    redirect_to deck_study_path(@deck), alert: "Undo not yet implemented."
+    undo_data = session.delete(:last_answer_undo)
+
+    unless undo_data
+      redirect_to deck_study_session_path(@deck), alert: "Nothing to undo."
+      return
+    end
+
+    card = current_user.cards.find_by(id: undo_data["card_id"])
+
+    unless card
+      redirect_to deck_study_session_path(@deck), alert: "Card not found."
+      return
+    end
+
+    # Restore card attributes and delete the last review
+    Card.transaction do
+      card.update!(undo_data["attributes"])
+      card.reviews.order(created_at: :desc).first&.destroy!
+    end
+
+    redirect_to deck_study_session_path(@deck), notice: "Last answer undone."
   end
 
   private

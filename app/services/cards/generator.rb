@@ -48,7 +48,7 @@ module Cards
         note: note,
         card_type_id: card_type_id,
         deck: deck,
-        home_deck: deck,
+        home_deck: nil,
         state: :new,
         due: 0,
         interval: 0,

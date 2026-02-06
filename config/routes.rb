@@ -49,12 +49,32 @@ Rails.application.routes.draw do
     end
   end
 
+  # Cards
+  resources :cards, only: %i[show edit update] do
+    collection do
+      post :bulk_flag
+      post :bulk_suspend
+      post :bulk_bury
+      post :bulk_reset_scheduling
+      post :bulk_set_due_date
+    end
+  end
+
   # Notes & Browser (to be expanded in Phase 3)
   resources :notes
   resources :note_types
 
   # Deck options presets
   resources :deck_options_presets
+
+  # Saved searches
+  resources :saved_searches, except: :show
+
+  # Flag names
+  resources :flag_names, only: %i[index create update destroy]
+
+  # Browser config (singular)
+  resource :browser_config, only: %i[show update]
 
   # Media management
   resources :media, only: %i[index show create destroy]

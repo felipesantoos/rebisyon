@@ -71,9 +71,10 @@ module Study
 
     # Resets all counts for today (called at day boundary)
     def reset
-      # Clear all keys for this user
-      # In a real implementation, this would use Solid Cache or Redis
-      # For now, we'll rely on the day-based key expiration
+      user.decks.find_each do |deck|
+        delete_key(new_cards_key(deck))
+        delete_key(reviews_key(deck))
+      end
     end
 
     private
@@ -137,6 +138,17 @@ module Study
       else
         @cache ||= {}
         @cache[key] = value
+      end
+    end
+
+    # Deletes a cache key
+    # @param key [String]
+    def delete_key(key)
+      if defined?(SolidCache)
+        SolidCache.delete(key)
+      else
+        @cache ||= {}
+        @cache.delete(key)
       end
     end
   end

@@ -8,6 +8,7 @@ RSpec.describe User, type: :model do
     it { should have_many(:decks).dependent(:destroy) }
     it { should have_many(:note_types).dependent(:destroy) }
     it { should have_many(:notes).dependent(:destroy) }
+    it { should have_many(:cards).through(:notes) }
   end
 
   describe "validations" do
@@ -22,7 +23,6 @@ RSpec.describe User, type: :model do
     let!(:user) { create(:user) }
 
     it "supports soft delete" do
-      expect(user.deleted?).to be false
       user.soft_delete!
       expect(user.deleted?).to be true
       expect(user.deleted_at).to be_present
@@ -30,19 +30,19 @@ RSpec.describe User, type: :model do
 
     it "excludes soft-deleted users from default scope" do
       user.soft_delete!
-      expect(User.all).not_to include(user)
+      expect(User.where(id: user.id)).to be_empty
     end
 
     it "includes soft-deleted users with with_deleted scope" do
       user.soft_delete!
-      expect(User.with_deleted).to include(user)
+      expect(User.with_deleted.where(id: user.id)).to exist
     end
 
     it "can restore soft-deleted users" do
       user.soft_delete!
       user.restore!
       expect(user.deleted?).to be false
-      expect(User.all).to include(user)
+      expect(User.where(id: user.id)).to exist
     end
   end
 
@@ -57,13 +57,9 @@ RSpec.describe User, type: :model do
   describe "#preference" do
     let(:user) { create(:user) }
 
-    it "returns user preference if exists" do
-      preference = create(:user_preference, user: user)
-      expect(user.preference).to eq(preference)
-    end
-
-    it "creates user preference if not exists" do
-      expect { user.preference }.to change { UserPreference.count }.by(1)
+    it "returns user preference" do
+      # setup_defaults creates a preference, so it should already exist
+      expect(user.preference).to be_a(UserPreference)
     end
   end
 

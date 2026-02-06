@@ -6,7 +6,7 @@ class NoteMedium < ApplicationRecord
 
   # Associations
   belongs_to :note
-  belongs_to :medium
+  belongs_to :medium, foreign_key: :media_id
 
   # Validations
   validates :field_name, length: { maximum: 100 }, allow_nil: true

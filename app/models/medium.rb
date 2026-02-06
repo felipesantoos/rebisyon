@@ -1,11 +1,19 @@
 # frozen_string_literal: true
 
 class Medium < ApplicationRecord
+  # Allow the 'hash' column despite conflicting with Object#hash
+  class << self
+    def instance_method_already_implemented?(method_name)
+      return true if method_name == "hash"
+      super
+    end
+  end
+
   include SoftDeletable
   include UserScoped
 
   # Associations
-  has_many :note_media, dependent: :destroy
+  has_many :note_media, foreign_key: :media_id, dependent: :destroy
   has_many :notes, through: :note_media
 
   # Active Storage attachment
@@ -13,10 +21,10 @@ class Medium < ApplicationRecord
 
   # Validations
   validates :filename, presence: true, length: { maximum: 255 }
-  validates :hash, presence: true, length: { is: 64 }, uniqueness: { scope: [:user_id, :deleted_at], conditions: -> { where(deleted_at: nil) } }
   validates :size, presence: true, numericality: { greater_than: 0 }
   validates :mime_type, presence: true, length: { maximum: 100 }
   validates :storage_path, presence: true, length: { maximum: 512 }
+  validate :hash_column_validations
 
   # Accessor for hash column (hash is a reserved method in Ruby)
   def hash_value
@@ -72,5 +80,18 @@ class Medium < ApplicationRecord
   # @return [Boolean]
   def video?
     mime_type&.start_with?("video/")
+  end
+
+  private
+
+  def hash_column_validations
+    h = hash_value
+    if h.blank?
+      errors.add(:hash, :blank)
+    elsif h.length != 64
+      errors.add(:hash, :wrong_length, count: 64)
+    elsif self.class.unscoped.where(user_id: user_id, deleted_at: nil).where.not(id: id).exists?(["\"hash\" = ?", h])
+      errors.add(:hash, :taken)
+    end
   end
 end

@@ -1,0 +1,59 @@
+<% content_for :title, "Card ##{@card.id}" %>
+<% content_for :page_title, "Card Details" %>
+
+<div class="space-y-6">
+  <div class="flex items-center space-x-4">
+    <%= link_to "Edit", edit_card_path(@card), class: "btn-secondary" %>
+    <%= link_to "Back to notes", notes_path, class: "text-gray-600 hover:text-gray-900" %>
+  </div>
+
+  <div class="card">
+    <h2 class="text-xl font-semibold text-gray-900 mb-4">Card Details</h2>
+    <dl class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div>
+        <dt class="text-sm font-medium text-gray-500">Note</dt>
+        <dd class="mt-1 text-sm text-gray-900">
+          <%= link_to @note.first_field.to_s.truncate(50), note_path(@note), class: "text-blue-600 hover:text-blue-700" %>
+        </dd>
+      </div>
+      <div>
+        <dt class="text-sm font-medium text-gray-500">Deck</dt>
+        <dd class="mt-1 text-sm text-gray-900">
+          <%= link_to @deck.full_name, deck_path(@deck), class: "text-blue-600 hover:text-blue-700" %>
+        </dd>
+      </div>
+      <div>
+        <dt class="text-sm font-medium text-gray-500">State</dt>
+        <dd class="mt-1 text-sm text-gray-900"><%= @card.state %></dd>
+      </div>
+      <div>
+        <dt class="text-sm font-medium text-gray-500">Interval</dt>
+        <dd class="mt-1 text-sm text-gray-900"><%= @card.interval %> days</dd>
+      </div>
+      <div>
+        <dt class="text-sm font-medium text-gray-500">Ease</dt>
+        <dd class="mt-1 text-sm text-gray-900"><%= @card.ease / 10.0 %>%</dd>
+      </div>
+      <div>
+        <dt class="text-sm font-medium text-gray-500">Reviews</dt>
+        <dd class="mt-1 text-sm text-gray-900"><%= @card.reps %></dd>
+      </div>
+      <div>
+        <dt class="text-sm font-medium text-gray-500">Lapses</dt>
+        <dd class="mt-1 text-sm text-gray-900"><%= @card.lapses %></dd>
+      </div>
+      <div>
+        <dt class="text-sm font-medium text-gray-500">Flag</dt>
+        <dd class="mt-1 text-sm text-gray-900"><%= @card.flag %></dd>
+      </div>
+      <div>
+        <dt class="text-sm font-medium text-gray-500">Suspended</dt>
+        <dd class="mt-1 text-sm text-gray-900"><%= @card.suspended? ? "Yes" : "No" %></dd>
+      </div>
+      <div>
+        <dt class="text-sm font-medium text-gray-500">Buried</dt>
+        <dd class="mt-1 text-sm text-gray-900"><%= @card.buried? ? "Yes" : "No" %></dd>
+      </div>
+    </dl>
+  </div>
+</div>

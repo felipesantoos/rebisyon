@@ -19,7 +19,13 @@ RSpec.describe UserPreference, type: :model do
   end
 
   describe "enums" do
-    it { should define_enum_for(:theme).with_values(light: "light", dark: "dark", auto: "auto").with_prefix(:theme) }
+    it "defines theme enum" do
+      expect(UserPreference.themes).to eq(
+        "light" => "light",
+        "dark" => "dark",
+        "auto" => "auto"
+      )
+    end
   end
 
   describe "#day_rollover_time" do

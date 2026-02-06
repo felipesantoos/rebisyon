@@ -43,15 +43,18 @@ module SoftDeletable
   end
 
   # Soft deletes the record by setting deleted_at timestamp
-  # @return [Boolean] true if save was successful
+  # @return [Boolean] true if update was successful
   def soft_delete!
-    update!(deleted_at: Time.current)
+    update_column(:deleted_at, Time.current)
   end
 
   # Restores a soft-deleted record
-  # @return [Boolean] true if save was successful
+  # @return [Boolean] true if update was successful
   def restore!
-    update!(deleted_at: nil)
+    # Clear the deleted_at in-memory first so ActiveRecord doesn't think it's destroyed
+    self.deleted_at = nil
+    self.class.unscoped.where(id: id).update_all(deleted_at: nil)
+    reload
   end
 
   # Checks if the record has been soft-deleted

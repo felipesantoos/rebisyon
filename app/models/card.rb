@@ -5,10 +5,12 @@ class Card < ApplicationRecord
   belongs_to :note
   belongs_to :deck
   belongs_to :home_deck, class_name: "Deck", optional: true
+  has_many :reviews, dependent: :destroy
 
   # Enums
   # Using _prefix: true to avoid conflict with ActiveRecord's new? method
-  enum state: { new: 0, learn: 1, review: 2, relearn: 3 }, _prefix: :state
+  # PostgreSQL enum type card_state stores string values
+  enum state: { new: "new", learn: "learn", review: "review", relearn: "relearn" }, _prefix: :state
 
   # Validations
   validates :card_type_id, presence: true

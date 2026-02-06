@@ -1,0 +1,37 @@
+<% content_for :title, "Flag Names" %>
+<% content_for :page_title, "Flag Names" %>
+
+<div class="space-y-6">
+  <div>
+    <h1 class="text-2xl font-semibold text-gray-900">Flag Names</h1>
+    <p class="mt-1 text-sm text-gray-500">Customize the names for your 7 card flags.</p>
+  </div>
+
+  <div class="card">
+    <div class="divide-y divide-gray-200">
+      <% @flags.each do |flag| %>
+        <div class="py-3">
+          <% if flag.persisted? %>
+            <%= form_with(model: flag, class: "flex items-center space-x-4") do |form| %>
+              <span class="text-sm font-medium text-gray-500 w-16">Flag <%= flag.flag_number %></span>
+              <%= form.text_field :name, class: "flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm" %>
+              <div class="flex items-center space-x-2">
+                <%= form.submit "Save", class: "btn-primary text-sm" %>
+                <%= button_to "Remove", flag_name_path(flag), method: :delete,
+                    class: "text-red-600 hover:text-red-700 text-sm",
+                    data: { confirm: "Are you sure?" } %>
+              </div>
+            <% end %>
+          <% else %>
+            <%= form_with(model: flag, url: flag_names_path, class: "flex items-center space-x-4") do |form| %>
+              <span class="text-sm font-medium text-gray-500 w-16">Flag <%= flag.flag_number %></span>
+              <%= form.hidden_field :flag_number %>
+              <%= form.text_field :name, placeholder: "Unnamed", class: "flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm" %>
+              <%= form.submit "Add", class: "btn-secondary text-sm" %>
+            <% end %>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

@@ -7,17 +7,13 @@
 class DailyResetJob < ApplicationJob
   queue_as :default
 
-  # Resets daily limits for all users
+  # Resets daily limits for all users and unburies cards
   def perform
-    # The DailyLimitTracker uses date-based keys, so old keys will naturally expire
-    # However, we can explicitly clear them if needed
-    
-    # For now, we rely on the date-based key expiration in DailyLimitTracker
-    # In a production system with Solid Cache, we could:
-    # - Delete keys matching the pattern "daily_limit:*:YYYY-MM-DD" for yesterday
-    # - Or rely on TTL expiration
-    
-    # This is a placeholder - actual implementation depends on cache backend
+    User.find_each do |user|
+      Study::DailyLimitTracker.new(user).reset
+      UnburyCardsJob.perform_later(user.id)
+    end
+
     Rails.logger.info "Daily reset job completed at #{Time.current}"
   end
 end

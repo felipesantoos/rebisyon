@@ -30,6 +30,7 @@ class User < ApplicationRecord
   has_many :check_database_logs, dependent: :destroy
   has_many :profiles, dependent: :destroy
   has_many :sync_metas, dependent: :destroy
+  has_many :cards, through: :notes
 
   # Callbacks
   after_create :setup_defaults

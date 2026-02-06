@@ -1,0 +1,64 @@
+<% content_for :title, "Browser Configuration" %>
+<% content_for :page_title, "Browser Configuration" %>
+
+<div class="space-y-6">
+  <div>
+    <h1 class="text-2xl font-semibold text-gray-900">Browser Configuration</h1>
+    <p class="mt-1 text-sm text-gray-500">Configure the card browser display settings.</p>
+  </div>
+
+  <div class="card">
+    <%= form_with(model: @browser_config, url: browser_config_path) do |form| %>
+      <% if @browser_config.errors.any? %>
+        <div class="bg-red-50 border-l-4 border-red-400 p-4 mb-6" role="alert">
+          <div class="ml-3">
+            <ul class="text-sm text-red-700 list-disc list-inside">
+              <% @browser_config.errors.each do |error| %>
+                <li><%= error.full_message %></li>
+              <% end %>
+            </ul>
+          </div>
+        </div>
+      <% end %>
+
+      <div class="space-y-6">
+        <div>
+          <h3 class="text-lg font-medium text-gray-900 mb-3">Visible Columns</h3>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <% %w[note deck tags due interval ease lapses reps state flag].each do |col| %>
+              <div class="flex items-center">
+                <%= check_box_tag "browser_config[visible_columns][]", col,
+                    @browser_config.visible_columns.include?(col),
+                    id: "col_#{col}",
+                    class: "h-4 w-4 text-blue-600 border-gray-300 rounded" %>
+                <%= label_tag "col_#{col}", col.titleize, class: "ml-2 text-sm text-gray-700" %>
+              </div>
+            <% end %>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="text-lg font-medium text-gray-900 mb-3">Sort</h3>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <%= form.label :sort_column, "Sort By", class: "block text-sm font-medium text-gray-700 mb-1" %>
+              <%= form.select :sort_column,
+                  options_for_select(%w[note deck tags due interval ease lapses reps state].map { |c| [c.titleize, c] }, @browser_config.sort_column),
+                  {}, class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" %>
+            </div>
+            <div>
+              <%= form.label :sort_direction, "Direction", class: "block text-sm font-medium text-gray-700 mb-1" %>
+              <%= form.select :sort_direction,
+                  options_for_select([["Ascending", "asc"], ["Descending", "desc"]], @browser_config.sort_direction),
+                  {}, class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" %>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex items-center space-x-4 pt-4">
+          <%= form.submit "Save Configuration", class: "btn-primary" %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>
