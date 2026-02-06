@@ -1,7 +1,5 @@
-<% content_for :title, mock_shared_deck_detail[:title] %>
-<% content_for :page_title, mock_shared_deck_detail[:title] %>
-<% deck = mock_shared_deck_detail %>
-<% ratings = mock_shared_deck_ratings %>
+<% content_for :title, @shared_deck.name %>
+<% content_for :page_title, @shared_deck.name %>
 
 <div class="max-w-6xl mx-auto space-y-6">
   <%# Back link %>
@@ -21,19 +19,20 @@
       <%# Header card %>
       <div class="card">
         <%# Category tag %>
-        <span class="tag-chip"><%= deck[:category] %></span>
+        <span class="tag-chip"><%= @shared_deck.category %></span>
 
         <%# Title %>
-        <h1 class="text-2xl font-bold text-gray-900 mt-2"><%= deck[:title] %></h1>
+        <h1 class="text-2xl font-bold text-gray-900 mt-2"><%= @shared_deck.name %></h1>
 
         <%# Author %>
-        <p class="text-gray-500 mt-1">by <span class="font-medium text-gray-700"><%= deck[:author] %></span></p>
+        <p class="text-gray-500 mt-1">by <span class="font-medium text-gray-700"><%= @shared_deck.author.email %></span></p>
 
         <%# Star rating with count %>
         <div class="flex items-center gap-2 mt-3">
           <span class="inline-flex items-center gap-0.5">
-            <% full_stars = deck[:stars].floor %>
-            <% has_half = (deck[:stars] - full_stars) >= 0.5 %>
+            <% stars = @shared_deck.rating_average || 0 %>
+            <% full_stars = stars.floor %>
+            <% has_half = (stars - full_stars) >= 0.5 %>
             <% (1..5).each do |i| %>
               <% if i <= full_stars %>
                 <span class="text-yellow-400 text-lg">&#9733;</span>
@@ -44,78 +43,41 @@
               <% end %>
             <% end %>
           </span>
-          <span class="text-gray-700 font-semibold"><%= deck[:stars] %></span>
-          <span class="text-gray-500 text-sm">(<%= deck[:ratings_count] %> ratings)</span>
+          <span class="text-gray-700 font-semibold"><%= stars %></span>
+          <span class="text-gray-500 text-sm">(<%= @ratings.size %> ratings)</span>
         </div>
 
         <%# Description %>
         <div class="mt-4">
           <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wider mb-2">Description</h3>
-          <p class="text-gray-700 whitespace-pre-line"><%= deck[:description] %></p>
+          <p class="text-gray-700 whitespace-pre-line"><%= @shared_deck.description %></p>
         </div>
-
-        <%# Tags %>
-        <% if deck[:tags]&.any? %>
-          <div class="mt-4">
-            <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wider mb-2">Tags</h3>
-            <div class="flex flex-wrap gap-2">
-              <% deck[:tags].each do |tag| %>
-                <span class="tag-chip"><%= tag %></span>
-              <% end %>
-            </div>
-          </div>
-        <% end %>
       </div>
-
-      <%# Sample cards %>
-      <% if deck[:sample_cards]&.any? %>
-        <div class="card">
-          <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wider mb-3">Sample Cards</h3>
-          <div class="overflow-x-auto">
-            <table class="w-full text-sm">
-              <thead>
-                <tr class="border-b border-gray-200">
-                  <th class="text-left py-2 px-3 font-medium text-gray-600">Front</th>
-                  <th class="text-left py-2 px-3 font-medium text-gray-600">Back</th>
-                </tr>
-              </thead>
-              <tbody>
-                <% deck[:sample_cards].each do |card| %>
-                  <tr class="border-b border-gray-100 last:border-0">
-                    <td class="py-2 px-3 text-gray-900"><%= card[:front] %></td>
-                    <td class="py-2 px-3 text-gray-700"><%= card[:back] %></td>
-                  </tr>
-                <% end %>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      <% end %>
 
       <%# Ratings section %>
       <div class="space-y-4">
         <%# Rating form %>
-        <%= render "shared_decks/rating_form", shared_deck_id: deck[:id] %>
+        <%= render "shared_decks/rating_form", shared_deck_id: @shared_deck.id %>
 
         <%# Existing ratings %>
-        <% if ratings.any? %>
+        <% if @ratings.any? %>
           <div class="card">
-            <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wider mb-3">Reviews (<%= ratings.size %>)</h3>
+            <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wider mb-3">Reviews (<%= @ratings.size %>)</h3>
             <div class="space-y-4">
-              <% ratings.each do |rating| %>
+              <% @ratings.each do |rating| %>
                 <div class="border-b border-gray-100 last:border-0 pb-4 last:pb-0">
                   <div class="flex items-center justify-between">
                     <div class="flex items-center gap-2">
-                      <span class="font-medium text-gray-900 text-sm"><%= rating[:user] %></span>
+                      <span class="font-medium text-gray-900 text-sm"><%= rating.user.email %></span>
                       <span class="inline-flex items-center gap-0.5">
                         <% (1..5).each do |i| %>
-                          <span class="<%= i <= rating[:stars] ? 'text-yellow-400' : 'text-gray-300' %> text-sm">&#9733;</span>
+                          <span class="<%= i <= rating.rating ? 'text-yellow-400' : 'text-gray-300' %> text-sm">&#9733;</span>
                         <% end %>
                       </span>
                     </div>
-                    <span class="text-xs text-gray-400"><%= rating[:created_at] %></span>
+                    <span class="text-xs text-gray-400"><%= rating.created_at.strftime("%Y-%m-%d") %></span>
                   </div>
-                  <p class="text-sm text-gray-600 mt-1"><%= rating[:comment] %></p>
+                  <p class="text-sm text-gray-600 mt-1"><%= rating.comment %></p>
                 </div>
               <% end %>
             </div>
@@ -138,23 +100,19 @@
         <dl class="mt-4 space-y-3 text-sm">
           <div class="flex justify-between">
             <dt class="text-gray-500">Size</dt>
-            <dd class="font-medium text-gray-900"><%= deck[:size] %></dd>
+            <dd class="font-medium text-gray-900"><%= number_to_human_size(@shared_deck.package_size) %></dd>
           </div>
           <div class="flex justify-between">
-            <dt class="text-gray-500">Cards</dt>
-            <dd class="font-medium text-gray-900"><%= number_with_delimiter(deck[:cards_count]) %></dd>
-          </div>
-          <div class="flex justify-between">
-            <dt class="text-gray-500">Notes</dt>
-            <dd class="font-medium text-gray-900"><%= number_with_delimiter(deck[:note_count]) %></dd>
+            <dt class="text-gray-500">Downloads</dt>
+            <dd class="font-medium text-gray-900"><%= number_with_delimiter(@shared_deck.download_count) %></dd>
           </div>
           <div class="flex justify-between">
             <dt class="text-gray-500">Last Updated</dt>
-            <dd class="font-medium text-gray-900"><%= deck[:updated_at] %></dd>
+            <dd class="font-medium text-gray-900"><%= @shared_deck.updated_at.strftime("%Y-%m-%d") %></dd>
           </div>
           <div class="flex justify-between">
             <dt class="text-gray-500">Created</dt>
-            <dd class="font-medium text-gray-900"><%= deck[:created_at] %></dd>
+            <dd class="font-medium text-gray-900"><%= @shared_deck.created_at.strftime("%Y-%m-%d") %></dd>
           </div>
         </dl>
       </div>
@@ -164,11 +122,11 @@
         <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wider mb-3">Stats</h3>
         <div class="grid grid-cols-2 gap-4">
           <div class="stat-card text-center">
-            <p class="text-2xl font-bold text-gray-900"><%= number_with_delimiter(deck[:downloads]) %></p>
+            <p class="text-2xl font-bold text-gray-900"><%= number_with_delimiter(@shared_deck.download_count) %></p>
             <p class="text-xs text-gray-500 mt-1">Downloads</p>
           </div>
           <div class="stat-card text-center">
-            <p class="text-2xl font-bold text-gray-900"><%= deck[:ratings_count] %></p>
+            <p class="text-2xl font-bold text-gray-900"><%= @ratings.size %></p>
             <p class="text-xs text-gray-500 mt-1">Ratings</p>
           </div>
         </div>

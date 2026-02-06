@@ -142,6 +142,9 @@ Rails.application.routes.draw do
   # Undo history
   resources :undo_histories, only: %i[index show], path: "undo-history"
 
+  # Reviews
+  resources :reviews, only: [:index]
+
   # Sync status
   resources :sync_metas, only: %i[index], path: "sync"
 

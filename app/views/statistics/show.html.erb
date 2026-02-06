@@ -1,7 +1,6 @@
 <% content_for :title, "Statistics" %>
 <% content_for :page_title, "Statistics" %>
-<% mock = mock_statistics %>
-<% period = params[:period] || "1mo" %>
+<% period = @period || "week" %>
 
 <div class="space-y-6" data-controller="statistics" data-statistics-period-value="<%= period %>">
   <%# Scope selector + time range pills %>
@@ -9,84 +8,54 @@
     <div class="flex items-center gap-3">
       <select class="form-select w-auto">
         <option selected>Whole collection</option>
-        <option>Japanese</option>
-        <option>Spanish</option>
-        <option>Default</option>
       </select>
     </div>
 
     <div class="flex items-center gap-1">
-      <%= link_to "1 month", statistics_path(period: "1mo"), class: period == "1mo" ? "pill-active" : "pill-inactive" %>
-      <%= link_to "3 months", statistics_path(period: "3mo"), class: period == "3mo" ? "pill-active" : "pill-inactive" %>
-      <%= link_to "1 year", statistics_path(period: "1yr"), class: period == "1yr" ? "pill-active" : "pill-inactive" %>
-      <%= link_to "All time", statistics_path(period: "all"), class: period == "all" ? "pill-active" : "pill-inactive" %>
+      <%= link_to "1 week", statistics_path(period: "week"), class: period == "week" ? "pill-active" : "pill-inactive" %>
+      <%= link_to "1 month", statistics_path(period: "month"), class: period == "month" ? "pill-active" : "pill-inactive" %>
+      <%= link_to "1 year", statistics_path(period: "year"), class: period == "year" ? "pill-active" : "pill-inactive" %>
     </div>
   </div>
 
   <%# Today summary card %>
-  <div class="card">
-    <h2 class="text-lg font-semibold text-gray-900 mb-4">Today</h2>
-    <div class="grid grid-cols-2 md:grid-cols-6 gap-4">
-      <div class="stat-card text-center">
-        <p class="text-2xl font-bold text-gray-900"><%= mock[:today_stats][:studied] %></p>
-        <p class="text-xs text-gray-500">Studied</p>
-      </div>
-      <div class="stat-card text-center">
-        <p class="text-2xl font-bold text-gray-900"><%= mock[:today_stats][:time_spent] %></p>
-        <p class="text-xs text-gray-500">Time</p>
-      </div>
-      <div class="stat-card text-center">
-        <p class="text-2xl font-bold text-green-600"><%= mock[:today_stats][:correct_percent] %>%</p>
-        <p class="text-xs text-gray-500">Correct</p>
-      </div>
-      <div class="stat-card text-center">
-        <p class="text-2xl font-bold text-blue-600"><%= mock[:today_stats][:again_count] %></p>
-        <p class="text-xs text-gray-500">Again</p>
-      </div>
-      <div class="stat-card text-center">
-        <p class="text-2xl font-bold text-purple-600"><%= mock[:today_stats][:mature_correct] %>%</p>
-        <p class="text-xs text-gray-500">Mature</p>
-      </div>
-      <div class="stat-card text-center">
-        <p class="text-2xl font-bold text-orange-600"><%= mock[:today_stats][:young_correct] %>%</p>
-        <p class="text-xs text-gray-500">Young</p>
+  <% if @statistics[:today_stats] %>
+    <div class="card">
+      <h2 class="text-lg font-semibold text-gray-900 mb-4">Today</h2>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="stat-card text-center">
+          <p class="text-2xl font-bold text-gray-900"><%= @statistics[:today_stats][:studied] %></p>
+          <p class="text-xs text-gray-500">Studied</p>
+        </div>
+        <div class="stat-card text-center">
+          <p class="text-2xl font-bold text-gray-900"><%= @statistics[:today_stats][:time_spent] %></p>
+          <p class="text-xs text-gray-500">Time</p>
+        </div>
+        <div class="stat-card text-center">
+          <p class="text-2xl font-bold text-green-600"><%= @statistics[:today_stats][:correct_percent] %>%</p>
+          <p class="text-xs text-gray-500">Correct</p>
+        </div>
+        <div class="stat-card text-center">
+          <p class="text-2xl font-bold text-blue-600"><%= @statistics[:today_stats][:again_count] %></p>
+          <p class="text-xs text-gray-500">Again</p>
+        </div>
       </div>
     </div>
-  </div>
-
-  <%# Calendar heatmap %>
-  <div class="card">
-    <h2 class="text-lg font-semibold text-gray-900 mb-4">Review Activity</h2>
-    <div data-controller="heatmap" data-heatmap-data-value="<%= mock[:calendar_heatmap].to_json %>">
-    </div>
-  </div>
-
-  <%# Future Due (stacked bar) %>
-  <div class="card">
-    <h2 class="text-lg font-semibold text-gray-900 mb-4">Future Due</h2>
-    <%= column_chart mock[:future_due].map { |date, vals|
-          vals.is_a?(Hash) ? vals.map { |k, v| { name: k, data: { date => v } } } : [{ name: "Cards", data: { date => vals } }]
-        }.flatten.group_by { |h| h[:name] }.map { |name, items|
-          { name: name, data: items.flat_map { |i| i[:data].to_a }.to_h }
-        },
-        stacked: true,
-        colors: ["#22C55E", "#F97316", "#3B82F6"],
-        library: { scales: { y: { title: { display: true, text: "Cards" } } } } %>
-  </div>
+  <% end %>
 
   <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
     <%# Reviews per day %>
     <div class="card">
       <h2 class="text-lg font-semibold text-gray-900 mb-4">Reviews</h2>
-      <%= line_chart mock[:reviews_per_day],
+      <%= line_chart @statistics[:reviews_per_day],
           colors: ["#3B82F6"],
           library: { scales: { y: { title: { display: true, text: "Reviews" } } } } %>
     </div>
 
     <%# Card counts (pie) %>
     <div class="card">
-      <h2 class="text-lg font-semibold text-gray-900 mb-4">Card Counts</h2>
-      <%= pie_chart mock[:card_counts],
+      <h2 class="text-lg font-semibold text-gray-900 mb-4">Card States</h2>
+      <%= pie_chart @statistics[:card_state_breakdown],
           colors: ["#3B82F6", "#F97316", "#22C55E", "#8B5CF6"] %>
     </div>
   </div>
@@ -95,17 +64,17 @@
     <%# Interval distribution (bar) %>
     <div class="card">
       <h2 class="text-lg font-semibold text-gray-900 mb-4">Intervals</h2>
-      <%= column_chart mock[:interval_distribution],
+      <%= column_chart @statistics[:interval_distribution],
           colors: ["#6366F1"],
           library: { scales: { y: { title: { display: true, text: "Cards" } } } } %>
     </div>
 
-    <%# Ease distribution (bar) %>
+    <%# Retention rate %>
     <div class="card">
-      <h2 class="text-lg font-semibold text-gray-900 mb-4">Ease</h2>
-      <%= column_chart mock[:ease_distribution],
-          colors: ["#EC4899"],
-          library: { scales: { y: { title: { display: true, text: "Cards" } } } } %>
+      <h2 class="text-lg font-semibold text-gray-900 mb-4">Retention Rate</h2>
+      <%= column_chart @statistics[:retention_rate],
+          colors: ["#22C55E"],
+          library: { scales: { y: { title: { display: true, text: "%" }, max: 100 } } } %>
     </div>
   </div>
 
@@ -113,24 +82,17 @@
     <%# Hourly breakdown (bar) %>
     <div class="card">
       <h2 class="text-lg font-semibold text-gray-900 mb-4">Hourly Breakdown</h2>
-      <%= column_chart mock[:hourly_breakdown],
+      <%= column_chart @statistics[:hourly_breakdown],
           colors: ["#14B8A6"],
           library: { scales: { y: { title: { display: true, text: "Reviews" } } } } %>
     </div>
 
-    <%# Answer buttons (pie) %>
+    <%# Review time per day %>
     <div class="card">
-      <h2 class="text-lg font-semibold text-gray-900 mb-4">Answer Buttons</h2>
-      <%= pie_chart mock[:answer_buttons],
-          colors: ["#DC2626", "#6B7280", "#16A34A", "#2563EB"] %>
+      <h2 class="text-lg font-semibold text-gray-900 mb-4">Time Spent (minutes)</h2>
+      <%= line_chart @statistics[:review_time_per_day],
+          colors: ["#EC4899"],
+          library: { scales: { y: { title: { display: true, text: "Minutes" } } } } %>
     </div>
-  </div>
-
-  <%# Added per day %>
-  <div class="card">
-    <h2 class="text-lg font-semibold text-gray-900 mb-4">Added</h2>
-    <%= column_chart mock[:added_per_day],
-        colors: ["#8B5CF6"],
-        library: { scales: { y: { title: { display: true, text: "Cards" } } } } %>
   </div>
 </div>

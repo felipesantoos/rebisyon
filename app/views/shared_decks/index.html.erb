@@ -11,37 +11,42 @@
 
 <div class="max-w-6xl mx-auto space-y-6">
   <%# Search bar %>
-  <div class="relative">
+  <%= form_with url: shared_decks_path, method: :get, local: true, class: "relative" do |form| %>
     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
       <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
       </svg>
     </div>
-    <input type="text" placeholder="Search shared decks..." class="form-input w-full pl-10">
-  </div>
+    <%= form.text_field :q, value: params[:q], placeholder: "Search shared decks...", class: "form-input w-full pl-10" %>
+  <% end %>
 
   <%# Category filter pills %>
   <div class="flex items-center gap-2 flex-wrap">
-    <% mock_shared_deck_categories.each_with_index do |category, index| %>
+    <%= link_to "All", shared_decks_path,
+        class: params[:category].blank? ? "pill-active" : "pill-inactive" %>
+    <% @categories.each do |category| %>
       <%= link_to category, shared_decks_path(category: category),
-          class: index == 0 ? "pill-active" : "pill-inactive" %>
+          class: params[:category] == category ? "pill-active" : "pill-inactive" %>
     <% end %>
   </div>
 
   <%# Sort options %>
   <div class="flex items-center gap-4 text-sm">
     <span class="text-gray-500">Sort by:</span>
-    <%= link_to "Popular", shared_decks_path(sort: "popular"), class: "font-medium text-blue-600 hover:text-blue-700" %>
-    <%= link_to "Top Rated", shared_decks_path(sort: "top_rated"), class: "text-gray-500 hover:text-gray-700" %>
-    <%= link_to "Newest", shared_decks_path(sort: "newest"), class: "text-gray-500 hover:text-gray-700" %>
+    <%= link_to "Popular", shared_decks_path(sort: "popular", category: params[:category], q: params[:q]),
+        class: (params[:sort].blank? || params[:sort] == "popular") ? "font-medium text-blue-600 hover:text-blue-700" : "text-gray-500 hover:text-gray-700" %>
+    <%= link_to "Top Rated", shared_decks_path(sort: "top_rated", category: params[:category], q: params[:q]),
+        class: params[:sort] == "top_rated" ? "font-medium text-blue-600 hover:text-blue-700" : "text-gray-500 hover:text-gray-700" %>
+    <%= link_to "Newest", shared_decks_path(sort: "newest", category: params[:category], q: params[:q]),
+        class: params[:sort] == "newest" ? "font-medium text-blue-600 hover:text-blue-700" : "text-gray-500 hover:text-gray-700" %>
   </div>
 
   <%# Featured section %>
-  <% if mock_featured_shared_decks.any? %>
+  <% if @featured.any? %>
     <div>
       <h2 class="text-lg font-semibold text-gray-900 mb-3">Featured Decks</h2>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <% mock_featured_shared_decks.each do |deck| %>
+        <% @featured.each do |deck| %>
           <%= render "shared_decks/deck_card", deck: deck %>
         <% end %>
       </div>
@@ -52,9 +57,12 @@
   <div>
     <h2 class="text-lg font-semibold text-gray-900 mb-3">All Decks</h2>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      <% mock_shared_decks.each do |deck| %>
+      <% @shared_decks.each do |deck| %>
         <%= render "shared_decks/deck_card", deck: deck %>
       <% end %>
     </div>
   </div>
+
+  <%# Pagination %>
+  <%== pagy_nav(@pagy) if @pagy.pages > 1 %>
 </div>

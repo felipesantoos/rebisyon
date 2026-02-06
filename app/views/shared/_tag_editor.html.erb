@@ -2,7 +2,7 @@
 <%# Usage: render "shared/tag_editor", tags: ["verb", "jlpt-n5"], field_name: "note[tags]" %>
 <% tags = local_assigns[:tags] || [] %>
 <% field_name = local_assigns[:field_name] || "tags" %>
-<% all_tags = local_assigns[:all_tags] || mock_all_tags %>
+<% all_tags = local_assigns[:all_tags] || (current_user ? current_user.notes.where(deleted_at: nil).where.not(tags: nil).where.not(tags: []).pluck(:tags).flatten.uniq.sort : []) %>
 
 <div data-controller="tag-input" data-tag-input-suggestions-value="<%= all_tags.to_json %>">
   <div class="flex flex-wrap items-center gap-1.5 px-3 py-2 border border-gray-300 rounded-md bg-white focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 min-h-[38px]"

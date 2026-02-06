@@ -1,40 +1,37 @@
 <% content_for :title, "Share a Deck" %>
 <% content_for :page_title, "Share a Deck" %>
-<% categories = mock_shared_deck_categories.reject { |c| c == "All" } %>
-<% flat_decks = [] %>
-<% flatten_decks = ->(decks) { decks.each { |d| flat_decks << d; flatten_decks.call(d[:children]) if d[:children]&.any? } } %>
-<% flatten_decks.call(mock_deck_tree) %>
+<% categories = SharedDeck.distinct.pluck(:category).compact.sort %>
 
 <div class="max-w-2xl mx-auto space-y-6">
   <div class="card">
-    <%= form_with url: shared_decks_path, method: :post do |form| %>
+    <%= form_with model: @shared_deck do |form| %>
       <div class="space-y-4">
         <%# Deck selector %>
         <div>
           <label for="shared_deck_deck_id" class="form-label">Deck</label>
           <select id="shared_deck_deck_id" name="shared_deck[deck_id]" class="form-select w-full">
             <option value="">Select a deck...</option>
-            <% flat_decks.each do |deck| %>
-              <option value="<%= deck[:id] %>"><%= deck[:full_name] %></option>
+            <% @decks.each do |deck| %>
+              <option value="<%= deck.id %>"><%= deck.full_name %></option>
             <% end %>
           </select>
         </div>
 
-        <%# Title %>
+        <%# Name %>
         <div>
-          <label for="shared_deck_title" class="form-label">Title</label>
-          <input type="text" id="shared_deck_title" name="shared_deck[title]" class="form-input w-full" placeholder="Enter a title for your shared deck">
+          <%= form.label :name, class: "form-label" %>
+          <%= form.text_field :name, class: "form-input w-full", placeholder: "Enter a name for your shared deck" %>
         </div>
 
         <%# Description %>
         <div>
-          <label for="shared_deck_description" class="form-label">Description</label>
-          <textarea id="shared_deck_description" name="shared_deck[description]" rows="5" class="form-input w-full" placeholder="Describe your deck and what it covers..."></textarea>
+          <%= form.label :description, class: "form-label" %>
+          <%= form.text_area :description, rows: 5, class: "form-input w-full", placeholder: "Describe your deck and what it covers..." %>
         </div>
 
         <%# Category %>
         <div>
-          <label for="shared_deck_category" class="form-label">Category</label>
+          <%= form.label :category, class: "form-label" %>
           <select id="shared_deck_category" name="shared_deck[category]" class="form-select w-full">
             <option value="">Select a category...</option>
             <% categories.each do |category| %>
@@ -43,10 +40,10 @@
           </select>
         </div>
 
-        <%# Tags %>
-        <div>
-          <label for="shared_deck_tags" class="form-label">Tags</label>
-          <input type="text" id="shared_deck_tags" name="shared_deck[tags]" class="form-input w-full" placeholder="Comma-separated tags, e.g. jlpt, n5, vocabulary">
+        <%# Public checkbox %>
+        <div class="flex items-center">
+          <%= form.check_box :is_public, class: "h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" %>
+          <%= form.label :is_public, "Make this deck publicly available", class: "ml-2 block text-sm text-gray-700" %>
         </div>
 
         <%# Actions %>

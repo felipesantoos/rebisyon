@@ -1,34 +1,19 @@
 <% content_for :title, "Trash" %>
 <% content_for :page_title, "Trash" %>
-<% content_for :page_actions do %>
-  <%= button_to deletion_logs_path, method: :delete, class: "btn-danger inline-flex items-center gap-1.5", data: { turbo_confirm: "Are you sure you want to permanently delete all items in the trash? This cannot be undone." } do %>
-    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-    </svg>
-    Empty Trash
-  <% end %>
-<% end %>
 
-<% logs = mock_deletion_logs %>
-<% filter = @filter %>
 <% type_filters = ["all", "note", "card", "deck", "note_type"] %>
 <% type_labels = { "all" => "All", "note" => "Notes", "card" => "Cards", "deck" => "Decks", "note_type" => "Note Types" } %>
 
-<% filtered_logs = filter == "all" ? logs : logs.select { |l| l[:object_type] == filter } %>
-
 <div class="space-y-6">
-  <%# Filter pills %>
   <div class="flex items-center gap-1">
     <% type_filters.each do |f| %>
-      <%= link_to type_labels[f], deletion_logs_path(filter: f), class: filter == f ? "pill-active" : "pill-inactive" %>
+      <%= link_to type_labels[f], deletion_logs_path(filter: f), class: @filter == f ? "pill-active" : "pill-inactive" %>
     <% end %>
   </div>
 
-  <%# Info text %>
   <p class="text-sm text-gray-500">Items in trash can be restored or permanently deleted.</p>
 
-  <% if filtered_logs.any? %>
-    <%# Deletion logs table %>
+  <% if @logs.any? %>
     <div class="card p-0">
       <div class="overflow-x-auto">
         <table class="w-full text-sm">
@@ -41,40 +26,25 @@
             </tr>
           </thead>
           <tbody>
-            <% filtered_logs.each do |log| %>
+            <% @logs.each do |log| %>
               <tr class="border-b border-gray-100 hover:bg-gray-50">
-                <%# Type badge %>
                 <td class="py-2 px-3">
                   <span class="inline-flex items-center gap-1.5 text-xs font-medium px-2 py-0.5 rounded-full
-                    <%= case log[:object_type]
+                    <%= case log.object_type
                         when 'note' then 'bg-blue-100 text-blue-800'
                         when 'card' then 'bg-green-100 text-green-800'
                         when 'deck' then 'bg-purple-100 text-purple-800'
                         when 'note_type' then 'bg-orange-100 text-orange-800'
                         end %>">
-                    <span class="w-1.5 h-1.5 rounded-full
-                      <%= case log[:object_type]
-                          when 'note' then 'bg-blue-500'
-                          when 'card' then 'bg-green-500'
-                          when 'deck' then 'bg-purple-500'
-                          when 'note_type' then 'bg-orange-500'
-                          end %>"></span>
-                    <%= log[:object_type].titleize %>
+                    <%= log.object_type.titleize %>
                   </span>
                 </td>
-
-                <%# Summary %>
-                <td class="py-2 px-3 text-gray-900 font-medium"><%= log[:summary] %></td>
-
-                <%# Deleted date %>
-                <td class="py-2 px-3 text-gray-500"><%= log[:deleted_at] %></td>
-
-                <%# Actions %>
+                <td class="py-2 px-3 text-gray-900 font-medium"><%= log.summary %></td>
+                <td class="py-2 px-3 text-gray-500"><%= log.deleted_at.strftime("%Y-%m-%d %H:%M") %></td>
                 <td class="py-2 px-3 text-right">
                   <div class="inline-flex items-center gap-2">
-                    <%= button_to "Restore", restore_deletion_log_path(log[:id]), method: :post, class: "btn-secondary text-xs px-2 py-1" %>
-                    <%= link_to "View", deletion_log_path(log[:id]), class: "text-xs text-blue-600 hover:text-blue-700 font-medium" %>
-                    <%= button_to "Delete", deletion_log_path(log[:id]), method: :delete, class: "btn-danger text-xs px-2 py-1", data: { turbo_confirm: "Permanently delete this item? This cannot be undone." } %>
+                    <%= button_to "Restore", restore_deletion_log_path(log), method: :post, class: "btn-secondary text-xs px-2 py-1" %>
+                    <%= link_to "View", deletion_log_path(log), class: "text-xs text-blue-600 hover:text-blue-700 font-medium" %>
                   </div>
                 </td>
               </tr>
@@ -84,11 +54,7 @@
       </div>
     </div>
   <% else %>
-    <%# Empty state %>
     <div class="card text-center py-12">
-      <svg class="w-12 h-12 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-      </svg>
       <h3 class="text-sm font-medium text-gray-900 mb-1">Trash is empty</h3>
       <p class="text-sm text-gray-500">No deleted items to show.</p>
     </div>

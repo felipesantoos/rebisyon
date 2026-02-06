@@ -14,4 +14,14 @@ class UndoHistory < ApplicationRecord
   validates :operation_data, presence: true
 
   scope :recent, -> { order(created_at: :desc) }
+
+  def summary
+    data = operation_data || {}
+    data["summary"] || "#{operation_type.titleize} operation"
+  end
+
+  def details
+    data = operation_data || {}
+    data["details"] || ""
+  end
 end

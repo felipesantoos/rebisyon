@@ -1,0 +1,60 @@
+<% content_for :title, "Media" %>
+<% content_for :page_title, "Media" %>
+
+<div class="max-w-6xl mx-auto space-y-6">
+  <%# Filter pills %>
+  <div class="flex items-center justify-between flex-wrap gap-3">
+    <div class="flex items-center gap-1">
+      <%= link_to "All", media_index_path(filter: "all"), class: @filter == "all" ? "pill-active" : "pill-inactive" %>
+      <%= link_to "Images", media_index_path(filter: "images"), class: @filter == "images" ? "pill-active" : "pill-inactive" %>
+      <%= link_to "Audio", media_index_path(filter: "audio"), class: @filter == "audio" ? "pill-active" : "pill-inactive" %>
+      <%= link_to "Video", media_index_path(filter: "video"), class: @filter == "video" ? "pill-active" : "pill-inactive" %>
+      <%= link_to "Unused", media_index_path(filter: "unused"), class: @filter == "unused" ? "pill-active" : "pill-inactive" %>
+    </div>
+    <%= button_to "Check Media", check_media_index_path, method: :post, class: "btn-secondary text-sm" %>
+  </div>
+
+  <% if @media_items.any? %>
+    <div class="card p-0">
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="border-b border-gray-200">
+              <th class="text-left py-2 px-3 text-xs font-medium text-gray-500 uppercase">Filename</th>
+              <th class="text-left py-2 px-3 text-xs font-medium text-gray-500 uppercase">Type</th>
+              <th class="text-left py-2 px-3 text-xs font-medium text-gray-500 uppercase">Size</th>
+              <th class="text-left py-2 px-3 text-xs font-medium text-gray-500 uppercase">Used</th>
+              <th class="text-left py-2 px-3 text-xs font-medium text-gray-500 uppercase">Date</th>
+              <th class="text-right py-2 px-3 text-xs font-medium text-gray-500 uppercase">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @media_items.each do |medium| %>
+              <tr class="border-b border-gray-100 hover:bg-gray-50">
+                <td class="py-2 px-3 font-medium text-gray-900"><%= medium.filename %></td>
+                <td class="py-2 px-3 text-gray-500"><%= medium.mime_type %></td>
+                <td class="py-2 px-3 text-gray-500"><%= number_to_human_size(medium.size) %></td>
+                <td class="py-2 px-3">
+                  <% usage = medium.note_media.count %>
+                  <span class="<%= usage > 0 ? 'text-green-600' : 'text-gray-400' %>"><%= usage %> notes</span>
+                </td>
+                <td class="py-2 px-3 text-gray-500"><%= medium.created_at.strftime("%Y-%m-%d") %></td>
+                <td class="py-2 px-3 text-right">
+                  <%= button_to medium_path(medium), method: :delete, class: "text-xs text-red-500 hover:text-red-700 font-medium",
+                      data: { turbo_confirm: "Delete this media file?" } do %>
+                    Delete
+                  <% end %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <%== pagy_nav(@pagy) if @pagy.pages > 1 %>
+  <% else %>
+    <div class="card text-center py-12">
+      <p class="text-sm text-gray-500">No media files found.</p>
+    </div>
+  <% end %>
+</div>

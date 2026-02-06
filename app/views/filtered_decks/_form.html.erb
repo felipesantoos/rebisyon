@@ -1,45 +1,54 @@
 <div class="card">
-  <%= form_with url: filtered_decks_path, method: :post, class: "space-y-4" do |form| %>
-    <div>
-      <%= form.label :name, "Name", class: "form-label" %>
-      <%= form.text_field :name, class: "form-input w-full", placeholder: "e.g. Cram: Due Today" %>
-    </div>
-
-    <div>
-      <%= form.label :search_filter, "Search Filter", class: "form-label" %>
-      <%= form.text_field :search_filter, class: "form-input w-full font-mono", placeholder: "e.g. is:due deck:Japanese" %>
-      <p class="mt-1 text-xs text-gray-500">
-        Examples: is:due, deck:Japanese, tag:leech, prop:ease<2.0
-      </p>
-    </div>
-
-    <div>
-      <%= form.label :search_filter_2, "Second Search Filter (optional)", class: "form-label" %>
-      <%= form.text_field :search_filter_2, class: "form-input w-full font-mono", placeholder: "Optional second filter" %>
-    </div>
-
-    <div class="grid grid-cols-2 gap-4">
-      <div>
-        <%= form.label :limit, "Limit Cards", class: "form-label" %>
-        <%= form.number_field :limit, value: 100, min: 1, class: "form-input w-full" %>
+  <%= form_with(model: @filtered_deck) do |form| %>
+    <% if @filtered_deck.errors.any? %>
+      <div class="bg-red-50 border-l-4 border-red-400 p-4 mb-4">
+        <ul class="list-disc list-inside text-sm text-red-700">
+          <% @filtered_deck.errors.full_messages.each do |msg| %>
+            <li><%= msg %></li>
+          <% end %>
+        </ul>
       </div>
+    <% end %>
+
+    <div class="space-y-4">
       <div>
-        <%= form.label :order, "Order By", class: "form-label" %>
-        <%= form.select :order,
-            ["Random", "Oldest seen first", "Increasing intervals", "Decreasing intervals", "Most lapses", "Order added", "Order due", "Latest added first"],
-            {},
-            class: "form-select w-full" %>
+        <%= form.label :name, "Name", class: "form-label" %>
+        <%= form.text_field :name, class: "form-input w-full", placeholder: "e.g. Cram: Due Today" %>
       </div>
-    </div>
 
-    <div class="flex items-center gap-2">
-      <%= form.check_box :reschedule, checked: true, class: "h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" %>
-      <%= form.label :reschedule, "Reschedule cards based on my answers in this deck", class: "text-sm text-gray-700" %>
-    </div>
+      <div>
+        <%= form.label :search_filter, "Search Filter", class: "form-label" %>
+        <%= form.text_field :search_filter, class: "form-input w-full font-mono", placeholder: "e.g. is:due deck:Japanese" %>
+        <p class="mt-1 text-xs text-gray-500">Examples: is:due, deck:Japanese, tag:leech, prop:ease<2.0</p>
+      </div>
 
-    <div class="flex items-center gap-3 pt-4 border-t border-gray-200">
-      <%= form.submit "Save Filtered Deck", class: "btn-primary" %>
-      <%= link_to "Cancel", filtered_decks_path, class: "btn-secondary" %>
+      <div>
+        <%= form.label :second_filter, "Second Search Filter (optional)", class: "form-label" %>
+        <%= form.text_field :second_filter, class: "form-input w-full font-mono", placeholder: "Optional second filter" %>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <%= form.label :limit_cards, "Limit Cards", class: "form-label" %>
+          <%= form.number_field :limit_cards, min: 1, class: "form-input w-full" %>
+        </div>
+        <div>
+          <%= form.label :order_by, "Order By", class: "form-label" %>
+          <%= form.select :order_by,
+              ["Random", "Oldest seen first", "Increasing intervals", "Decreasing intervals", "Most lapses", "Order added", "Order due", "Latest added first"],
+              {}, class: "form-select w-full" %>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <%= form.check_box :reschedule, class: "h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" %>
+        <%= form.label :reschedule, "Reschedule cards based on my answers in this deck", class: "text-sm text-gray-700" %>
+      </div>
+
+      <div class="flex items-center gap-3 pt-4 border-t border-gray-200">
+        <%= form.submit "Save Filtered Deck", class: "btn-primary" %>
+        <%= link_to "Cancel", filtered_decks_path, class: "btn-secondary" %>
+      </div>
     </div>
   <% end %>
 </div>

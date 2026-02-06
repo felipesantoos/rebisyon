@@ -1,60 +1,42 @@
 <% content_for :title, "Undo History" %>
 <% content_for :page_title, "Undo History" %>
 
-<% history = mock_undo_history %>
-<% filter = @filter %>
-<% type_filters = ["all", "delete", "edit", "review", "add", "move", "bulk_edit", "suspend", "import"] %>
-<% type_labels = { "all" => "All", "delete" => "Delete", "edit" => "Edit", "review" => "Review", "add" => "Add", "move" => "Move", "bulk_edit" => "Bulk Edit", "suspend" => "Suspend", "import" => "Import" } %>
+<% operation_colors = {
+  "edit_note" => "bg-blue-100 text-blue-800",
+  "delete_note" => "bg-red-100 text-red-800",
+  "move_card" => "bg-purple-100 text-purple-800",
+  "change_flag" => "bg-yellow-100 text-yellow-800",
+  "add_tag" => "bg-emerald-100 text-emerald-800",
+  "remove_tag" => "bg-orange-100 text-orange-800",
+  "change_deck" => "bg-indigo-100 text-indigo-800"
+} %>
 
-<% filtered_history = filter == "all" ? history : history.select { |h| h[:operation] == filter } %>
-
-<%# Helper for operation badge colors %>
-<%
-  operation_colors = {
-    "delete" => "bg-red-100 text-red-800",
-    "edit" => "bg-blue-100 text-blue-800",
-    "review" => "bg-green-100 text-green-800",
-    "add" => "bg-emerald-100 text-emerald-800",
-    "move" => "bg-purple-100 text-purple-800",
-    "bulk_edit" => "bg-indigo-100 text-indigo-800",
-    "suspend" => "bg-yellow-100 text-yellow-800",
-    "import" => "bg-cyan-100 text-cyan-800"
-  }
-%>
+<% type_filters = ["all"] + UndoHistory::OPERATION_TYPES %>
 
 <div class="space-y-6">
-  <%# Filter pills %>
   <div class="flex items-center gap-1 flex-wrap">
     <% type_filters.each do |f| %>
-      <%= link_to type_labels[f], undo_histories_path(filter: f), class: filter == f ? "pill-active" : "pill-inactive" %>
+      <%= link_to f == "all" ? "All" : f.titleize, undo_histories_path(filter: f), class: @filter == f ? "pill-active" : "pill-inactive" %>
     <% end %>
   </div>
 
-  <% if filtered_history.any? %>
-    <%# Timeline entries %>
+  <% if @history.any? %>
     <div class="space-y-3">
-      <% filtered_history.each do |entry| %>
-        <%= link_to undo_history_path(entry[:id]), class: "card block hover:shadow-md transition-shadow" do %>
+      <% @history.each do |entry| %>
+        <%= link_to undo_history_path(entry), class: "card block hover:shadow-md transition-shadow" do %>
           <div class="flex items-start gap-4">
-            <%# Operation badge %>
             <div class="flex-shrink-0 mt-0.5">
-              <span class="inline-block text-xs font-medium px-2.5 py-1 rounded-full <%= operation_colors[entry[:operation]] || 'bg-gray-100 text-gray-800' %>">
-                <%= entry[:operation].titleize %>
+              <span class="inline-block text-xs font-medium px-2.5 py-1 rounded-full <%= operation_colors[entry.operation_type] || 'bg-gray-100 text-gray-800' %>">
+                <%= entry.operation_type.titleize %>
               </span>
             </div>
-
-            <%# Content %>
             <div class="flex-1 min-w-0">
-              <p class="text-sm font-medium text-gray-900"><%= entry[:summary] %></p>
-              <p class="text-sm text-gray-500 mt-0.5"><%= entry[:details] %></p>
+              <p class="text-sm font-medium text-gray-900"><%= entry.summary %></p>
+              <p class="text-sm text-gray-500 mt-0.5"><%= entry.details %></p>
             </div>
-
-            <%# Timestamp %>
             <div class="flex-shrink-0 text-right">
-              <p class="text-xs text-gray-400"><%= entry[:timestamp] %></p>
+              <p class="text-xs text-gray-400"><%= entry.created_at.strftime("%Y-%m-%d %H:%M") %></p>
             </div>
-
-            <%# Chevron %>
             <div class="flex-shrink-0 text-gray-300">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
@@ -64,12 +46,9 @@
         <% end %>
       <% end %>
     </div>
+    <%== pagy_nav(@pagy) if @pagy.pages > 1 %>
   <% else %>
-    <%# Empty state %>
     <div class="card text-center py-12">
-      <svg class="w-12 h-12 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-      </svg>
       <h3 class="text-sm font-medium text-gray-900 mb-1">No history</h3>
       <p class="text-sm text-gray-500">No operations matching this filter.</p>
     </div>

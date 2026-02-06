@@ -1,28 +1,36 @@
 <div class="card">
-  <%= form_with url: profiles_path, method: :post, class: "space-y-5" do |form| %>
-    <%# Profile name %>
-    <div>
-      <%= form.label :name, "Profile Name", class: "form-label" %>
-      <%= form.text_field :name, class: "form-input w-full", placeholder: "e.g. Work, Language Study" %>
-    </div>
+  <%= form_with(model: @profile) do |form| %>
+    <% if @profile.errors.any? %>
+      <div class="bg-red-50 border-l-4 border-red-400 p-4 mb-4">
+        <ul class="list-disc list-inside text-sm text-red-700">
+          <% @profile.errors.full_messages.each do |msg| %>
+            <li><%= msg %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
 
-    <%# AnkiWeb sync toggle %>
-    <div class="flex items-center gap-3">
-      <%= form.check_box :ankiweb_sync_enabled, class: "h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded", id: "ankiweb_sync_toggle" %>
-      <%= form.label :ankiweb_sync_enabled, "Enable AnkiWeb Sync", class: "text-sm font-medium text-gray-700" %>
-    </div>
+    <div class="space-y-5">
+      <div>
+        <%= form.label :name, "Profile Name", class: "form-label" %>
+        <%= form.text_field :name, class: "form-input w-full", placeholder: "e.g. Work, Language Study" %>
+      </div>
 
-    <%# AnkiWeb username %>
-    <div>
-      <%= form.label :ankiweb_username, "AnkiWeb Username", class: "form-label" %>
-      <%= form.text_field :ankiweb_username, class: "form-input w-full", placeholder: "user@example.com" %>
-      <p class="text-xs text-gray-500 mt-1">Your AnkiWeb email address for syncing.</p>
-    </div>
+      <div class="flex items-center gap-3">
+        <%= form.check_box :ankiweb_sync_enabled, class: "h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" %>
+        <%= form.label :ankiweb_sync_enabled, "Enable AnkiWeb Sync", class: "text-sm font-medium text-gray-700" %>
+      </div>
 
-    <%# Submit / Cancel %>
-    <div class="flex items-center gap-3 pt-2">
-      <%= form.submit "Save Profile", class: "btn-primary" %>
-      <%= link_to "Cancel", profiles_path, class: "btn-secondary" %>
+      <div>
+        <%= form.label :ankiweb_username, "AnkiWeb Username", class: "form-label" %>
+        <%= form.text_field :ankiweb_username, class: "form-input w-full", placeholder: "user@example.com" %>
+        <p class="text-xs text-gray-500 mt-1">Your AnkiWeb email address for syncing.</p>
+      </div>
+
+      <div class="flex items-center gap-3 pt-2">
+        <%= form.submit "Save Profile", class: "btn-primary" %>
+        <%= link_to "Cancel", profiles_path, class: "btn-secondary" %>
+      </div>
     </div>
   <% end %>
 </div>

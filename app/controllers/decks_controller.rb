@@ -1,16 +1,32 @@
 # frozen_string_literal: true
 
 class DecksController < ApplicationController
+  include DeckTreeBuilder
+
   before_action :authenticate_user!
   before_action :set_deck, only: %i[show edit update destroy]
 
   # GET /decks
   def index
-    @decks = current_user.decks.roots.ordered
+    @deck_tree = build_deck_tree(current_user)
+    @totals = compute_totals(@deck_tree)
   end
 
   # GET /decks/:id
   def show
+    counts = Card.where(deck_id: [@deck.id] + @deck.descendant_ids)
+                 .where(suspended: false, buried: false)
+                 .select(
+                   "COUNT(*) FILTER (WHERE state = 'new') AS new_count",
+                   "COUNT(*) FILTER (WHERE state IN ('learn', 'relearn')) AS learn_count",
+                   "COUNT(*) FILTER (WHERE state = 'review' AND due <= #{Card.sanitize_sql_for_conditions(["?", (Time.current.to_f * 1000).to_i])}) AS due_count",
+                   "COUNT(*) AS total_count"
+                 ).take
+
+    @new_count = counts&.new_count.to_i
+    @learn_count = counts&.learn_count.to_i
+    @due_count = counts&.due_count.to_i
+    @total_cards = counts&.total_count.to_i
   end
 
   # GET /decks/new

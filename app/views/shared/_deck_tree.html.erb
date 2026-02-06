@@ -1,6 +1,6 @@
 <%# Reusable deck tree with indentation, collapse/expand, count columns %>
-<%# Usage: render "shared/deck_tree", decks: mock_deck_tree, show_gear: true %>
-<% decks = local_assigns[:decks] || mock_deck_tree %>
+<%# Usage: render "shared/deck_tree", decks: @deck_tree, show_gear: true %>
+<% decks = local_assigns[:decks] || [] %>
 <% show_gear = local_assigns.fetch(:show_gear, true) %>
 <% show_study = local_assigns.fetch(:show_study, true) %>
 
@@ -24,9 +24,7 @@
             <span class="w-5 mr-1"></span>
           <% end %>
           <% if show_study %>
-            <a href="#" class="text-sm text-gray-900 hover:text-blue-600 font-medium truncate">
-              <%= deck[:name] %>
-            </a>
+            <%= link_to deck[:name], deck_path(deck[:id]), class: "text-sm text-gray-900 hover:text-blue-600 font-medium truncate" %>
           <% else %>
             <span class="text-sm text-gray-900 font-medium truncate"><%= deck[:name] %></span>
           <% end %>
@@ -52,12 +50,11 @@
               </svg>
             </button>
             <div data-dropdown-target="menu" class="hidden absolute right-0 mt-1 w-48 bg-white rounded-md shadow-lg border border-gray-200 z-20 py-1">
-              <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Rename</a>
-              <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Options</a>
-              <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Export</a>
-              <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Create Subdeck</a>
+              <%= link_to "Study", deck_study_session_path(deck[:id]), class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" %>
+              <%= link_to "Options", edit_deck_path(deck[:id]), class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" %>
+              <%= link_to "Create Subdeck", new_deck_path(parent_id: deck[:id]), class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" %>
               <hr class="my-1 border-gray-200">
-              <a href="#" class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50">Delete</a>
+              <%= button_to "Delete", deck_path(deck[:id]), method: :delete, class: "block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50", data: { turbo_confirm: "Are you sure?" } %>
             </div>
           </div>
         </td>

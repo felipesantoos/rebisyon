@@ -1,0 +1,107 @@
+<% content_for :title, "Review History" %>
+<% content_for :page_title, "Review History" %>
+
+<%
+  rating_labels = { 1 => "Again", 2 => "Hard", 3 => "Good", 4 => "Easy" }
+  rating_colors = {
+    1 => "bg-red-100 text-red-800",
+    2 => "bg-orange-100 text-orange-800",
+    3 => "bg-green-100 text-green-800",
+    4 => "bg-blue-100 text-blue-800"
+  }
+  type_labels = { "learn" => "Learn", "review" => "Review", "relearn" => "Relearn", "cram" => "Cram" }
+%>
+
+<div class="space-y-6">
+  <%# Filters %>
+  <div class="card">
+    <div class="space-y-4">
+      <%# Deck filter %>
+      <div>
+        <label class="form-label">Deck</label>
+        <select class="form-select" onchange="window.location.href = this.value">
+          <option value="<%= reviews_path(rating: params[:rating], type: params[:type]) %>" <%= "selected" unless params[:deck_id].present? %>>All Decks</option>
+          <% @decks.each do |deck| %>
+            <option value="<%= reviews_path(deck_id: deck.id, rating: params[:rating], type: params[:type]) %>" <%= "selected" if params[:deck_id].to_s == deck.id.to_s %>>
+              <%= deck.name %>
+            </option>
+          <% end %>
+        </select>
+      </div>
+
+      <%# Rating filter %>
+      <div>
+        <label class="form-label">Rating</label>
+        <div class="flex items-center gap-1 flex-wrap">
+          <%= link_to "All", reviews_path(deck_id: params[:deck_id], type: params[:type]), class: params[:rating].blank? ? "pill-active" : "pill-inactive" %>
+          <% rating_labels.each do |value, label| %>
+            <%= link_to label, reviews_path(deck_id: params[:deck_id], rating: value, type: params[:type]), class: params[:rating].to_s == value.to_s ? "pill-active" : "pill-inactive" %>
+          <% end %>
+        </div>
+      </div>
+
+      <%# Type filter %>
+      <div>
+        <label class="form-label">Type</label>
+        <div class="flex items-center gap-1 flex-wrap">
+          <%= link_to "All", reviews_path(deck_id: params[:deck_id], rating: params[:rating]), class: params[:type].blank? ? "pill-active" : "pill-inactive" %>
+          <% type_labels.each do |value, label| %>
+            <%= link_to label, reviews_path(deck_id: params[:deck_id], rating: params[:rating], type: value), class: params[:type].to_s == value ? "pill-active" : "pill-inactive" %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <%# Results table %>
+  <% if @reviews.any? %>
+    <div class="card p-0">
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="border-b border-gray-200">
+              <th class="text-left py-2 px-3 text-xs font-medium text-gray-500 uppercase">Date</th>
+              <th class="text-left py-2 px-3 text-xs font-medium text-gray-500 uppercase">Card</th>
+              <th class="text-left py-2 px-3 text-xs font-medium text-gray-500 uppercase">Deck</th>
+              <th class="text-left py-2 px-3 text-xs font-medium text-gray-500 uppercase">Rating</th>
+              <th class="text-left py-2 px-3 text-xs font-medium text-gray-500 uppercase">Interval</th>
+              <th class="text-left py-2 px-3 text-xs font-medium text-gray-500 uppercase">Ease</th>
+              <th class="text-left py-2 px-3 text-xs font-medium text-gray-500 uppercase">Time</th>
+              <th class="text-left py-2 px-3 text-xs font-medium text-gray-500 uppercase">Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @reviews.each do |review| %>
+              <tr class="border-b border-gray-100 hover:bg-gray-50">
+                <td class="py-2 px-3 text-gray-500 whitespace-nowrap"><%= review.created_at.strftime("%Y-%m-%d %H:%M") %></td>
+                <td class="py-2 px-3 text-gray-900 font-medium max-w-[200px] truncate">
+                  <% if review.card&.note&.sort_field.present? %>
+                    <%= truncate(review.card.note.sort_field, length: 50) %>
+                  <% else %>
+                    Card #<%= review.card_id %>
+                  <% end %>
+                </td>
+                <td class="py-2 px-3 text-gray-600 truncate max-w-[150px]"><%= review.card&.deck&.name %></td>
+                <td class="py-2 px-3">
+                  <span class="inline-flex items-center text-xs font-medium px-2 py-0.5 rounded-full <%= rating_colors[review.rating] %>">
+                    <%= rating_labels[review.rating] %>
+                  </span>
+                </td>
+                <td class="py-2 px-3 text-gray-600"><%= review.interval %>d</td>
+                <td class="py-2 px-3 text-gray-600"><%= (review.ease / 10.0).round(0) %>%</td>
+                <td class="py-2 px-3 text-gray-600"><%= (review.time_ms / 1000.0).round(1) %>s</td>
+                <td class="py-2 px-3 text-gray-600"><%= type_labels[review.type] || review.type&.capitalize %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <%== pagy_nav(@pagy) if @pagy.pages > 1 %>
+  <% else %>
+    <div class="card text-center py-12">
+      <h3 class="text-sm font-medium text-gray-900 mb-1">No reviews found</h3>
+      <p class="text-sm text-gray-500">No review history matching the selected filters.</p>
+    </div>
+  <% end %>
+</div>

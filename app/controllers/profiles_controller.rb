@@ -2,27 +2,51 @@
 
 class ProfilesController < ApplicationController
   before_action :authenticate_user!
+  before_action :set_profile, only: %i[show edit update destroy]
 
   def index
-    @profiles = helpers.mock_profiles
+    @profiles = current_user.profiles.ordered
   end
 
   def show
-    @profile = helpers.mock_profile_detail
   end
 
-  def new; end
-  def edit; end
+  def new
+    @profile = current_user.profiles.build
+  end
+
+  def edit
+  end
 
   def create
-    redirect_to profiles_path, notice: "Profile created."
+    @profile = current_user.profiles.build(profile_params)
+    if @profile.save
+      redirect_to @profile, notice: "Profile created."
+    else
+      render :new, status: :unprocessable_entity
+    end
   end
 
   def update
-    redirect_to profiles_path, notice: "Profile updated."
+    if @profile.update(profile_params)
+      redirect_to @profile, notice: "Profile updated."
+    else
+      render :edit, status: :unprocessable_entity
+    end
   end
 
   def destroy
+    @profile.soft_delete!
     redirect_to profiles_path, notice: "Profile deleted."
+  end
+
+  private
+
+  def set_profile
+    @profile = current_user.profiles.find(params[:id])
+  end
+
+  def profile_params
+    params.require(:profile).permit(:name, :ankiweb_sync_enabled, :ankiweb_username)
   end
 end

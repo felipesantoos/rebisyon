@@ -1,5 +1,6 @@
 <%# Browser results table with sortable columns and selectable rows %>
-<% cards = mock_browser_data[:cards] %>
+<% cards = @notes.flat_map { |note| note.cards.map { |card| [card, note] } } %>
+<% flag_colors = ['', '#EF4444', '#F97316', '#22C55E', '#3B82F6', '#EC4899', '#14B8A6', '#8B5CF6'] %>
 
 <div class="flex-1 overflow-auto" data-controller="table-select" data-browser-target="tableContainer">
   <table class="browser-table" data-table-select-target="table">
@@ -23,14 +24,20 @@
       </tr>
     </thead>
     <tbody>
-      <% cards.each_with_index do |card, index| %>
+      <% cards.each_with_index do |(card, note), index| %>
+        <% note_type = note.note_type %>
+        <% card_type_name = note_type&.card_type_names&.at(card.card_type_id.to_i) || "Card #{card.card_type_id}" %>
+        <% sort_field = note.sort_field.presence || note.first_field || "Note ##{note.id}" %>
+        <% tags = note.tags || [] %>
+        <% front_html = note.fields_json&.values&.first.to_s %>
+        <% back_html = note.fields_json&.values&.drop(1)&.join("<hr>").to_s %>
         <tr class="cursor-pointer"
             data-table-select-target="row"
-            data-card-id="<%= card[:id] %>"
+            data-card-id="<%= card.id %>"
             data-action="click->table-select#selectRow click->browser#previewCard"
             data-index="<%= index %>"
-            data-front="<%= card[:front] %>"
-            data-back="<%= card[:back] %>">
+            data-front="<%= front_html %>"
+            data-back="<%= back_html %>">
           <td class="w-8">
             <input type="checkbox" class="h-3.5 w-3.5 text-blue-600 border-gray-300 rounded"
                    data-table-select-target="checkbox"
@@ -38,30 +45,37 @@
           </td>
           <td class="font-medium text-gray-900">
             <div class="flex items-center gap-2">
-              <% if card[:flag] > 0 %>
-                <span class="w-2 h-2 rounded-full flex-shrink-0" style="background-color: <%= ['', '#EF4444', '#F97316', '#22C55E', '#3B82F6', '#EC4899', '#14B8A6', '#8B5CF6'][card[:flag]] %>"></span>
+              <% if card.flag > 0 %>
+                <span class="w-2 h-2 rounded-full flex-shrink-0" style="background-color: <%= flag_colors[card.flag] %>"></span>
               <% end %>
-              <span class="truncate"><%= card[:sort_field] %></span>
+              <span class="truncate"><%= sort_field %></span>
             </div>
           </td>
-          <td class="text-gray-600"><%= card[:card_type] %></td>
+          <td class="text-gray-600"><%= card_type_name %></td>
           <td class="text-gray-600">
-            <% if card[:due] == "New" %>
+            <% if card.state_new? %>
               <span class="count-new font-medium">New</span>
-            <% elsif card[:due] == "Today" %>
-              <span class="count-review font-medium">Today</span>
+            <% elsif card.state_learn? || card.state_relearn? %>
+              <span class="count-review font-medium">Learning</span>
             <% else %>
-              <%= card[:due].to_s.sub("2026-", "") %>
+              <% due_date = Time.at(card.due / 1000).to_date rescue nil %>
+              <% if due_date && due_date <= Date.today %>
+                <span class="count-review font-medium">Today</span>
+              <% elsif due_date %>
+                <%= due_date.strftime("%m-%d") %>
+              <% else %>
+                --
+              <% end %>
             <% end %>
           </td>
-          <td class="text-gray-600 truncate max-w-[150px]"><%= card[:deck] %></td>
+          <td class="text-gray-600 truncate max-w-[150px]"><%= card.deck&.name %></td>
           <td>
             <div class="flex flex-wrap gap-1">
-              <% card[:tags].first(2).each do |tag| %>
+              <% tags.first(2).each do |tag| %>
                 <span class="tag-chip text-[10px]"><%= tag %></span>
               <% end %>
-              <% if card[:tags].size > 2 %>
-                <span class="text-[10px] text-gray-400">+<%= card[:tags].size - 2 %></span>
+              <% if tags.size > 2 %>
+                <span class="text-[10px] text-gray-400">+<%= tags.size - 2 %></span>
               <% end %>
             </div>
           </td>

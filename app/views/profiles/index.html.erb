@@ -10,65 +10,46 @@
 <% end %>
 
 <div class="max-w-5xl mx-auto">
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-    <% @profiles.each do |profile| %>
-      <div class="card <%= profile[:active] ? 'ring-2 ring-blue-500' : '' %>">
-        <%# Header with name and status %>
-        <div class="flex items-start justify-between mb-3">
-          <div>
-            <h3 class="text-lg font-semibold text-gray-900"><%= profile[:name] %></h3>
-            <div class="flex items-center gap-1.5 mt-1">
-              <% if profile[:active] %>
-                <span class="w-2.5 h-2.5 rounded-full bg-green-500"></span>
-                <span class="text-xs font-medium text-green-700">Active</span>
-              <% else %>
-                <span class="w-2.5 h-2.5 rounded-full bg-gray-400"></span>
-                <span class="text-xs font-medium text-gray-500">Inactive</span>
-              <% end %>
+  <% if @profiles.any? %>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <% @profiles.each do |profile| %>
+        <div class="card">
+          <div class="flex items-start justify-between mb-3">
+            <div>
+              <h3 class="text-lg font-semibold text-gray-900"><%= profile.name %></h3>
             </div>
+            <% if profile.ankiweb_sync_enabled %>
+              <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
+                Sync
+              </span>
+            <% else %>
+              <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-600">
+                No Sync
+              </span>
+            <% end %>
           </div>
-          <%# Sync status icon %>
-          <% if profile[:sync_enabled] %>
-            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
-              <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-              </svg>
-              Sync
-            </span>
-          <% else %>
-            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-600">
-              No Sync
-            </span>
-          <% end %>
-        </div>
 
-        <%# Card/note counts %>
-        <div class="grid grid-cols-2 gap-3 mb-4">
-          <div class="p-2 bg-gray-50 rounded-md text-center">
-            <p class="text-lg font-bold text-gray-900"><%= number_with_delimiter(profile[:cards_count]) %></p>
-            <p class="text-xs text-gray-500">Cards</p>
+          <div class="text-sm text-gray-500 mb-4">
+            <p>Created: <%= profile.created_at.strftime("%Y-%m-%d") %></p>
+            <% if profile.ankiweb_username.present? %>
+              <p>AnkiWeb: <%= profile.ankiweb_username %></p>
+            <% end %>
           </div>
-          <div class="p-2 bg-gray-50 rounded-md text-center">
-            <p class="text-lg font-bold text-gray-900"><%= number_with_delimiter(profile[:notes_count]) %></p>
-            <p class="text-xs text-gray-500">Notes</p>
-          </div>
-        </div>
 
-        <%# Actions %>
-        <div class="flex items-center gap-2 pt-3 border-t border-gray-200">
-          <% unless profile[:active] %>
-            <button class="btn-primary text-xs px-3 py-1.5">Switch</button>
-          <% end %>
-          <%= link_to "Edit", edit_profile_path(profile[:id]), class: "btn-secondary text-xs px-3 py-1.5" %>
-          <% unless profile[:active] %>
-            <%= button_to profile_path(profile[:id]), method: :delete, class: "btn-danger text-xs px-3 py-1.5",
-                data: { turbo_confirm: "Are you sure you want to delete the profile '#{profile[:name]}'? This cannot be undone." } do %>
+          <div class="flex items-center gap-2 pt-3 border-t border-gray-200">
+            <%= link_to "Edit", edit_profile_path(profile), class: "btn-secondary text-xs px-3 py-1.5" %>
+            <%= button_to profile_path(profile), method: :delete, class: "btn-danger text-xs px-3 py-1.5",
+                data: { turbo_confirm: "Are you sure you want to delete the profile '#{profile.name}'?" } do %>
               Delete
             <% end %>
-          <% end %>
-          <%= link_to "View", profile_path(profile[:id]), class: "text-xs text-blue-600 hover:text-blue-700 font-medium ml-auto" %>
+            <%= link_to "View", profile_path(profile), class: "text-xs text-blue-600 hover:text-blue-700 font-medium ml-auto" %>
+          </div>
         </div>
-      </div>
-    <% end %>
-  </div>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="card text-center py-12">
+      <p class="text-sm text-gray-500">No profiles yet.</p>
+    </div>
+  <% end %>
 </div>

@@ -1,23 +1,30 @@
 <% content_for :title, "Deck Options" %>
 <% content_for :page_title, "Deck Options" %>
-<% mock = mock_deck_options %>
-<% opts = mock[:current] %>
+<%
+  all_presets = current_user.deck_options_presets.where(deleted_at: nil).ordered
+  opts = @preset.options_json || {}
+  daily_limits = opts["daily_limits"] || {}
+  new_cards = opts["new_cards"] || {}
+  lapses_opts = opts["lapses"] || {}
+  display_opts = opts["display"] || {}
+  burying_opts = opts["burying"] || {}
+  advanced_opts = opts["advanced"] || {}
+%>
 
 <div class="max-w-3xl mx-auto space-y-6" data-controller="deck-options">
   <%# Preset selector %>
   <div class="flex items-center gap-3">
     <select class="form-select w-auto" data-deck-options-target="presetSelect" data-action="change->deck-options#switchPreset">
-      <% mock[:presets].each do |preset| %>
-        <option value="<%= preset[:id] %>" <%= "selected" if preset[:id] == opts[:id] %>>
-          <%= preset[:name] %><%= " (default)" if preset[:is_default] %>
+      <% all_presets.each do |preset| %>
+        <option value="<%= preset.id %>" <%= "selected" if preset.id == @preset.id %>>
+          <%= preset.name %>
         </option>
       <% end %>
     </select>
     <div class="flex items-center gap-1">
-      <button class="btn-secondary text-xs px-3 py-1.5" data-action="click->deck-options#addPreset">Add</button>
-      <button class="btn-secondary text-xs px-3 py-1.5" data-action="click->deck-options#clonePreset">Clone</button>
-      <button class="btn-secondary text-xs px-3 py-1.5" data-action="click->deck-options#renamePreset">Rename</button>
-      <button class="btn-danger text-xs px-3 py-1.5" data-action="click->deck-options#removePreset">Remove</button>
+      <%= link_to "Add", new_deck_options_preset_path, class: "btn-secondary text-xs px-3 py-1.5" %>
+      <%= link_to "Edit", edit_deck_options_preset_path(@preset), class: "btn-secondary text-xs px-3 py-1.5" %>
+      <%= button_to "Remove", deck_options_preset_path(@preset), method: :delete, class: "btn-danger text-xs px-3 py-1.5", data: { turbo_confirm: "Are you sure?" } %>
     </div>
   </div>
 
@@ -33,13 +40,11 @@
       <div class="grid grid-cols-2 gap-4">
         <div>
           <label class="form-label">New cards/day</label>
-          <input type="number" value="<%= opts[:daily_limits][:new_cards] %>" class="form-input">
-          <p class="text-xs text-gray-500 mt-1">Today: <%= opts[:daily_limits][:new_today] %></p>
+          <input type="number" value="<%= daily_limits["new_cards"] || 20 %>" class="form-input" readonly>
         </div>
         <div>
           <label class="form-label">Maximum reviews/day</label>
-          <input type="number" value="<%= opts[:daily_limits][:max_reviews] %>" class="form-input">
-          <p class="text-xs text-gray-500 mt-1">Today: <%= opts[:daily_limits][:reviews_today] %></p>
+          <input type="number" value="<%= daily_limits["max_reviews"] || 200 %>" class="form-input" readonly>
         </div>
       </div>
     </div>
@@ -56,28 +61,28 @@
     <div data-collapsible-target="content" class="space-y-4 mt-4">
       <div>
         <label class="form-label">Learning steps</label>
-        <input type="text" value="<%= opts[:new_cards][:learning_steps] %>" class="form-input" placeholder="1m 10m">
+        <input type="text" value="<%= new_cards["learning_steps"] || "1m 10m" %>" class="form-input" placeholder="1m 10m" readonly>
         <p class="text-xs text-gray-500 mt-1">Steps in minutes (e.g., 1m 10m)</p>
       </div>
       <div class="grid grid-cols-2 gap-4">
         <div>
           <label class="form-label">Graduating interval</label>
           <div class="flex items-center gap-2">
-            <input type="number" value="<%= opts[:new_cards][:graduating_interval] %>" class="form-input">
+            <input type="number" value="<%= new_cards["graduating_interval"] || 1 %>" class="form-input" readonly>
             <span class="text-sm text-gray-500">days</span>
           </div>
         </div>
         <div>
           <label class="form-label">Easy interval</label>
           <div class="flex items-center gap-2">
-            <input type="number" value="<%= opts[:new_cards][:easy_interval] %>" class="form-input">
+            <input type="number" value="<%= new_cards["easy_interval"] || 4 %>" class="form-input" readonly>
             <span class="text-sm text-gray-500">days</span>
           </div>
         </div>
       </div>
       <div>
         <label class="form-label">Insertion order</label>
-        <select class="form-select">
+        <select class="form-select" disabled>
           <option selected>Sequential (oldest cards first)</option>
           <option>Random</option>
         </select>
@@ -96,29 +101,29 @@
     <div data-collapsible-target="content" class="space-y-4 mt-4">
       <div>
         <label class="form-label">Relearning steps</label>
-        <input type="text" value="<%= opts[:lapses][:relearning_steps] %>" class="form-input" placeholder="10m">
+        <input type="text" value="<%= lapses_opts["relearning_steps"] || "10m" %>" class="form-input" placeholder="10m" readonly>
       </div>
       <div class="grid grid-cols-2 gap-4">
         <div>
           <label class="form-label">Minimum interval</label>
           <div class="flex items-center gap-2">
-            <input type="number" value="<%= opts[:lapses][:minimum_interval] %>" class="form-input">
+            <input type="number" value="<%= lapses_opts["minimum_interval"] || 1 %>" class="form-input" readonly>
             <span class="text-sm text-gray-500">days</span>
           </div>
         </div>
         <div>
           <label class="form-label">Leech threshold</label>
           <div class="flex items-center gap-2">
-            <input type="number" value="<%= opts[:lapses][:leech_threshold] %>" class="form-input">
+            <input type="number" value="<%= lapses_opts["leech_threshold"] || 8 %>" class="form-input" readonly>
             <span class="text-sm text-gray-500">lapses</span>
           </div>
         </div>
       </div>
       <div>
         <label class="form-label">Leech action</label>
-        <select class="form-select">
-          <option selected>Tag Only</option>
-          <option>Suspend Card</option>
+        <select class="form-select" disabled>
+          <option <%= "selected" if (lapses_opts["leech_action"] || "Tag Only") == "Tag Only" %>>Tag Only</option>
+          <option <%= "selected" if lapses_opts["leech_action"] == "Suspend Card" %>>Suspend Card</option>
         </select>
       </div>
     </div>
@@ -134,20 +139,20 @@
     </div>
     <div data-collapsible-target="content" class="space-y-3 mt-4">
       <label class="flex items-center gap-3 cursor-pointer">
-        <input type="checkbox" <%= "checked" if opts[:display][:show_timer] %> class="w-4 h-4 text-blue-600 border-gray-300 rounded">
+        <input type="checkbox" <%= "checked" if display_opts["show_timer"] %> class="w-4 h-4 text-blue-600 border-gray-300 rounded" disabled>
         <span class="text-sm text-gray-700">Show answer timer</span>
       </label>
       <label class="flex items-center gap-3 cursor-pointer">
-        <input type="checkbox" <%= "checked" if opts[:display][:autoplay_audio] %> class="w-4 h-4 text-blue-600 border-gray-300 rounded">
+        <input type="checkbox" <%= "checked" if display_opts["autoplay_audio"] %> class="w-4 h-4 text-blue-600 border-gray-300 rounded" disabled>
         <span class="text-sm text-gray-700">Automatically play audio</span>
       </label>
       <label class="flex items-center gap-3 cursor-pointer">
-        <input type="checkbox" <%= "checked" if opts[:display][:auto_advance] %> class="w-4 h-4 text-blue-600 border-gray-300 rounded">
+        <input type="checkbox" <%= "checked" if display_opts["auto_advance"] %> class="w-4 h-4 text-blue-600 border-gray-300 rounded" disabled>
         <span class="text-sm text-gray-700">Auto advance</span>
       </label>
       <div class="pl-7">
         <label class="form-label">Wait time (seconds)</label>
-        <input type="number" value="<%= opts[:display][:auto_advance_seconds] %>" class="form-input w-32">
+        <input type="number" value="<%= display_opts["auto_advance_seconds"] || 10 %>" class="form-input w-32" readonly>
       </div>
     </div>
   </div>
@@ -162,15 +167,15 @@
     </div>
     <div data-collapsible-target="content" class="hidden space-y-3 mt-4">
       <label class="flex items-center gap-3 cursor-pointer">
-        <input type="checkbox" <%= "checked" if opts[:burying][:bury_new_siblings] %> class="w-4 h-4 text-blue-600 border-gray-300 rounded">
+        <input type="checkbox" <%= "checked" if burying_opts["bury_new_siblings"] %> class="w-4 h-4 text-blue-600 border-gray-300 rounded" disabled>
         <span class="text-sm text-gray-700">Bury new siblings of reviewed cards</span>
       </label>
       <label class="flex items-center gap-3 cursor-pointer">
-        <input type="checkbox" <%= "checked" if opts[:burying][:bury_review_siblings] %> class="w-4 h-4 text-blue-600 border-gray-300 rounded">
+        <input type="checkbox" <%= "checked" if burying_opts["bury_review_siblings"] %> class="w-4 h-4 text-blue-600 border-gray-300 rounded" disabled>
         <span class="text-sm text-gray-700">Bury review siblings of new cards</span>
       </label>
       <label class="flex items-center gap-3 cursor-pointer">
-        <input type="checkbox" <%= "checked" if opts[:burying][:bury_interday_learning] %> class="w-4 h-4 text-blue-600 border-gray-300 rounded">
+        <input type="checkbox" <%= "checked" if burying_opts["bury_interday_learning"] %> class="w-4 h-4 text-blue-600 border-gray-300 rounded" disabled>
         <span class="text-sm text-gray-700">Bury interday learning siblings</span>
       </label>
     </div>
@@ -189,41 +194,41 @@
         <div>
           <label class="form-label">Maximum interval</label>
           <div class="flex items-center gap-2">
-            <input type="number" value="<%= opts[:advanced][:maximum_interval] %>" class="form-input">
+            <input type="number" value="<%= advanced_opts["maximum_interval"] || 36500 %>" class="form-input" readonly>
             <span class="text-sm text-gray-500">days</span>
           </div>
         </div>
         <div>
           <label class="form-label">Starting ease</label>
-          <input type="number" value="<%= opts[:advanced][:starting_ease] %>" step="0.01" class="form-input">
+          <input type="number" value="<%= advanced_opts["starting_ease"] || 2.5 %>" step="0.01" class="form-input" readonly>
         </div>
       </div>
       <div class="grid grid-cols-2 gap-4">
         <div>
           <label class="form-label">Easy bonus</label>
-          <input type="number" value="<%= opts[:advanced][:easy_bonus] %>" step="0.01" class="form-input">
+          <input type="number" value="<%= advanced_opts["easy_bonus"] || 1.3 %>" step="0.01" class="form-input" readonly>
         </div>
         <div>
           <label class="form-label">Interval modifier</label>
-          <input type="number" value="<%= opts[:advanced][:interval_modifier] %>" step="0.01" class="form-input">
+          <input type="number" value="<%= advanced_opts["interval_modifier"] || 1.0 %>" step="0.01" class="form-input" readonly>
         </div>
       </div>
       <div class="grid grid-cols-2 gap-4">
         <div>
           <label class="form-label">Hard interval</label>
-          <input type="number" value="<%= opts[:advanced][:hard_interval] %>" step="0.01" class="form-input">
+          <input type="number" value="<%= advanced_opts["hard_interval"] || 1.2 %>" step="0.01" class="form-input" readonly>
         </div>
         <div>
           <label class="form-label">New interval</label>
-          <input type="number" value="<%= opts[:advanced][:new_interval] %>" step="0.01" class="form-input">
+          <input type="number" value="<%= advanced_opts["new_interval"] || 0.0 %>" step="0.01" class="form-input" readonly>
         </div>
       </div>
     </div>
   </div>
 
-  <%# Save/Revert footer %>
+  <%# Edit footer %>
   <div class="flex items-center justify-between pt-2">
-    <button class="btn-secondary" data-action="click->deck-options#revert">Revert</button>
-    <button class="btn-primary" data-action="click->deck-options#save">Save</button>
+    <%= link_to "Back to presets", deck_options_presets_path, class: "btn-secondary" %>
+    <%= link_to "Edit", edit_deck_options_preset_path(@preset), class: "btn-primary" %>
   </div>
 </div>

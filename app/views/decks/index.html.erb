@@ -10,20 +10,48 @@
 <% end %>
 
 <div class="max-w-4xl mx-auto" data-controller="deck-tree">
-  <div class="card p-0">
-    <table class="w-full">
-      <thead>
-        <tr class="border-b border-gray-200">
-          <th class="text-left text-xs font-medium text-gray-500 uppercase tracking-wider py-3 px-4">Deck</th>
-          <th class="text-right text-xs font-medium text-blue-500 uppercase tracking-wider py-3 px-3 w-20">New</th>
-          <th class="text-right text-xs font-medium text-orange-500 uppercase tracking-wider py-3 px-3 w-20">Learn</th>
-          <th class="text-right text-xs font-medium text-green-500 uppercase tracking-wider py-3 px-3 w-20">Due</th>
-          <th class="w-10 py-3 px-3"></th>
-        </tr>
-      </thead>
-      <tbody>
-        <%= render "shared/deck_tree", decks: mock_deck_tree, show_gear: true, show_study: true %>
-      </tbody>
-    </table>
-  </div>
+  <% if @deck_tree.any? %>
+    <div class="card p-0">
+      <table class="w-full">
+        <thead>
+          <tr class="border-b border-gray-200">
+            <th class="text-left text-xs font-medium text-gray-500 uppercase tracking-wider py-3 px-4">Deck</th>
+            <th class="text-right text-xs font-medium text-blue-500 uppercase tracking-wider py-3 px-3 w-20">New</th>
+            <th class="text-right text-xs font-medium text-orange-500 uppercase tracking-wider py-3 px-3 w-20">Learn</th>
+            <th class="text-right text-xs font-medium text-green-500 uppercase tracking-wider py-3 px-3 w-20">Due</th>
+            <th class="w-10 py-3 px-3"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <%= render "shared/deck_tree", decks: @deck_tree, show_gear: true, show_study: true %>
+        </tbody>
+        <tfoot>
+          <tr class="border-t-2 border-gray-200 bg-gray-50">
+            <td class="py-2 px-4 text-sm font-semibold text-gray-700">Total</td>
+            <td class="py-2 px-3 text-right">
+              <span class="count-new text-sm font-bold"><%= @totals[:new_count] %></span>
+            </td>
+            <td class="py-2 px-3 text-right">
+              <span class="count-learning text-sm font-bold"><%= @totals[:learn_count] %></span>
+            </td>
+            <td class="py-2 px-3 text-right">
+              <span class="count-review text-sm font-bold"><%= @totals[:due_count] %></span>
+            </td>
+            <td class="py-2 px-3"></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  <% else %>
+    <div class="card text-center py-12">
+      <svg class="w-12 h-12 text-gray-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+      </svg>
+      <h3 class="text-sm font-medium text-gray-900 mb-1">No decks yet</h3>
+      <p class="text-sm text-gray-500">Create your first deck to start studying.</p>
+      <div class="mt-4">
+        <%= link_to "Create Deck", new_deck_path, class: "btn-primary" %>
+      </div>
+    </div>
+  <% end %>
 </div>

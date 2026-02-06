@@ -27,7 +27,8 @@ class StatisticsController < ApplicationController
       interval_distribution: interval_distribution_data,
       card_state_breakdown: card_state_breakdown_data,
       hourly_breakdown: hourly_breakdown_data,
-      deck_overview: deck_overview_data
+      deck_overview: deck_overview_data,
+      today_stats: today_stats_data
     }
   end
 
@@ -64,7 +65,7 @@ class StatisticsController < ApplicationController
 
     # Group by interval ranges and calculate retention
     retention_by_range = {}
-    
+
     ["1 day", "2-7 days", "8-30 days", "31-90 days", "91-365 days", "365+ days"].each do |range|
       range_bounds = range_to_interval_bounds(range)
       if range_bounds.nil?
@@ -73,7 +74,7 @@ class StatisticsController < ApplicationController
       else
         range_reviews = reviews.where("reviews.interval" => range_bounds)
       end
-      
+
       total = range_reviews.count
       correct = range_reviews.where("reviews.rating >= ?", 3).count
       percentage = total.positive? ? ((correct.to_f / total) * 100).round(1) : 0
@@ -170,6 +171,27 @@ class StatisticsController < ApplicationController
         buried_cards: all_cards.count(&:buried)
       }
     end
+  end
+
+  # Today's study statistics
+  # @return [Hash]
+  def today_stats_data
+    today_reviews = Review.joins(card: :deck)
+                          .where(decks: { user_id: current_user.id })
+                          .where(reviews: { created_at: Time.current.beginning_of_day..Time.current })
+
+    total = today_reviews.count
+    correct = today_reviews.where("reviews.rating >= ?", 3).count
+    again = today_reviews.where(rating: 1).count
+    time_ms = today_reviews.sum(:time_ms)
+    minutes = (time_ms / 60_000.0).round
+
+    {
+      studied: total,
+      time_spent: "#{minutes}m",
+      correct_percent: total.positive? ? ((correct.to_f / total) * 100).round(1) : 0,
+      again_count: again
+    }
   end
 
   # Gets the start of the period

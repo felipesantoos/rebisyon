@@ -1,6 +1,11 @@
 <% content_for :title, @note_type.name %>
 <% content_for :page_title, @note_type.name %>
-<% mock = mock_note_type_detail %>
+<%
+  nt_fields = @note_type.fields
+  nt_card_types = @note_type.card_types
+  nt_templates = @note_type.templates
+  sample_fields = nt_fields.each_with_object({}) { |f, h| h[f["name"] || f[:name]] = "(#{f["name"] || f[:name]})" }
+%>
 
 <div class="max-w-4xl mx-auto" data-controller="tabs">
   <%# Tab navigation %>
@@ -28,7 +33,9 @@
         </button>
       </div>
       <div data-fields-editor-target="container" class="space-y-2">
-        <% mock[:fields].each_with_index do |field, index| %>
+        <% nt_fields.each_with_index do |field, index| %>
+          <% field_name = field["name"] || field[:name] %>
+          <% field_desc = field["description"] || field[:description] || "" %>
           <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-md group" data-fields-editor-target="field">
             <input type="hidden" value="<%= index %>" data-ordinal>
             <%# Drag handle %>
@@ -38,9 +45,9 @@
               </svg>
             </div>
             <%# Field name %>
-            <input type="text" value="<%= field[:name] %>" class="form-input flex-1">
+            <input type="text" value="<%= field_name %>" class="form-input flex-1">
             <%# Description %>
-            <input type="text" value="<%= field[:description] %>" placeholder="Description" class="form-input flex-1 text-gray-500">
+            <input type="text" value="<%= field_desc %>" placeholder="Description" class="form-input flex-1 text-gray-500">
             <%# Actions %>
             <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
               <button data-action="click->fields-editor#moveUp" class="p-1 text-gray-400 hover:text-gray-600 rounded hover:bg-gray-200">
@@ -61,21 +68,24 @@
 
   <%# Cards tab %>
   <div data-tabs-target="panel" class="hidden" data-controller="template-editor"
-       data-sample-fields='{"Front": "(Front)", "Back": "(Back)"}'>
-    <% mock[:card_types].each do |ct| %>
+       data-sample-fields='<%= sample_fields.to_json %>'>
+    <% nt_card_types.each do |ct| %>
+      <% ct_name = ct["name"] || ct[:name] %>
+      <% ct_front = nt_templates.dig("#{ct_name}_front") || nt_templates.dig("Front") || "" %>
+      <% ct_back = nt_templates.dig("#{ct_name}_back") || nt_templates.dig("Back") || "" %>
       <div class="card mb-6">
-        <h2 class="text-lg font-semibold text-gray-900 mb-4"><%= ct[:name] %></h2>
+        <h2 class="text-lg font-semibold text-gray-900 mb-4"><%= ct_name %></h2>
         <div class="grid grid-cols-2 gap-4">
           <div>
             <label class="form-label">Front Template</label>
             <textarea rows="6" class="form-input font-mono text-sm" data-template-editor-target="frontTemplate"
-                      data-action="input->template-editor#updatePreview"><%= ct[:front_template] %></textarea>
-            <p class="text-xs text-gray-500 mt-1">Available fields: <% mock[:fields].each do |f| %><code class="bg-gray-100 px-1 rounded">{{<%= f[:name] %>}}</code> <% end %></p>
+                      data-action="input->template-editor#updatePreview"><%= ct_front %></textarea>
+            <p class="text-xs text-gray-500 mt-1">Available fields: <% nt_fields.each do |f| %><code class="bg-gray-100 px-1 rounded">{{<%= f["name"] || f[:name] %>}}</code> <% end %></p>
           </div>
           <div>
             <label class="form-label">Back Template</label>
             <textarea rows="6" class="form-input font-mono text-sm" data-template-editor-target="backTemplate"
-                      data-action="input->template-editor#updatePreview"><%= ct[:back_template] %></textarea>
+                      data-action="input->template-editor#updatePreview"><%= ct_back %></textarea>
           </div>
         </div>
         <%# Live preview %>
@@ -94,7 +104,7 @@
       <h2 class="text-lg font-semibold text-gray-900 mb-4">Styling (CSS)</h2>
       <textarea rows="15" class="form-input font-mono text-sm"
                 data-template-editor-target="styling"
-                data-action="input->template-editor#updatePreview"><%= mock[:card_types].first[:styling] %></textarea>
+                data-action="input->template-editor#updatePreview"><%= nt_templates["Styling"] || "" %></textarea>
       <p class="text-xs text-gray-500 mt-2">CSS applied to all card templates in this note type.</p>
     </div>
   </div>
@@ -104,7 +114,7 @@
     <%= link_to "Back to note types", note_types_path, class: "text-sm text-gray-600 hover:text-gray-900" %>
     <div class="flex items-center gap-2">
       <button class="btn-secondary">Clone</button>
-      <button class="btn-primary">Save</button>
+      <%= link_to "Edit", edit_note_type_path(@note_type), class: "btn-primary" %>
     </div>
   </div>
 </div>

@@ -2,26 +2,48 @@
 
 class AddOnsController < ApplicationController
   before_action :authenticate_user!
+  before_action :set_add_on, only: %i[show update destroy]
 
   def index
-    @add_ons = helpers.mock_add_ons
+    @add_ons = current_user.add_ons.order(:name)
   end
 
   def show
-    @add_on = helpers.mock_add_on_detail
   end
 
-  def new; end
+  def new
+    @add_on = current_user.add_ons.build
+  end
 
   def create
-    redirect_to add_ons_path, notice: "Add-on installed."
+    @add_on = current_user.add_ons.build(add_on_params)
+    if @add_on.save
+      redirect_to add_ons_path, notice: "Add-on installed."
+    else
+      render :new, status: :unprocessable_entity
+    end
   end
 
   def update
-    redirect_to add_ons_path, notice: "Add-on updated."
+    if @add_on.update(add_on_params)
+      redirect_to add_on_path(@add_on), notice: "Add-on updated."
+    else
+      redirect_to add_on_path(@add_on), alert: @add_on.errors.full_messages.join(", ")
+    end
   end
 
   def destroy
+    @add_on.destroy
     redirect_to add_ons_path, notice: "Add-on removed."
+  end
+
+  private
+
+  def set_add_on
+    @add_on = current_user.add_ons.find(params[:id])
+  end
+
+  def add_on_params
+    params.require(:add_on).permit(:code, :name, :version, :enabled, config_json: {})
   end
 end

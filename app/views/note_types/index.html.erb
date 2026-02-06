@@ -1,11 +1,11 @@
 <% content_for :title, "Note Types" %>
 <% content_for :page_title, "Note Types" %>
-<% mock = mock_note_types %>
+<% note_counts = current_user.notes.where(deleted_at: nil).group(:note_type_id).count %>
 
 <div class="max-w-3xl mx-auto space-y-6">
   <%# Action bar %>
   <div class="flex items-center justify-between">
-    <p class="text-sm text-gray-500"><%= mock.size %> note types</p>
+    <p class="text-sm text-gray-500"><%= @note_types.size %> note types</p>
     <div class="flex items-center gap-2">
       <%= link_to new_note_type_path, class: "btn-primary inline-flex items-center gap-1.5" do %>
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -19,7 +19,7 @@
   <%# Note type list %>
   <div class="card p-0">
     <div class="divide-y divide-gray-200">
-      <% mock.each do |nt| %>
+      <% @note_types.each do |nt| %>
         <div class="flex items-center justify-between px-4 py-3 hover:bg-gray-50 transition-colors group">
           <div class="flex-1 min-w-0">
             <div class="flex items-center gap-3">
@@ -27,20 +27,20 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
               </svg>
               <div>
-                <h3 class="text-sm font-medium text-gray-900"><%= nt[:name] %></h3>
+                <h3 class="text-sm font-medium text-gray-900"><%= nt.name %></h3>
                 <p class="text-xs text-gray-500">
-                  <%= pluralize(nt[:fields].size, "field") %> &middot;
-                  <%= pluralize(nt[:card_types].size, "card type") %> &middot;
-                  <%= pluralize(nt[:note_count], "note") %>
+                  <%= pluralize(nt.fields.size, "field") %> &middot;
+                  <%= pluralize(nt.card_types.size, "card type") %> &middot;
+                  <%= pluralize(note_counts[nt.id] || 0, "note") %>
                 </p>
               </div>
             </div>
           </div>
           <div class="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-            <a href="#" class="text-xs text-blue-600 hover:text-blue-700 font-medium">Fields</a>
-            <a href="#" class="text-xs text-blue-600 hover:text-blue-700 font-medium">Cards</a>
-            <button class="text-xs text-blue-600 hover:text-blue-700 font-medium">Rename</button>
-            <button class="text-xs text-gray-400 hover:text-red-600 font-medium">Delete</button>
+            <%= link_to "Fields", note_type_path(nt), class: "text-xs text-blue-600 hover:text-blue-700 font-medium" %>
+            <%= link_to "Cards", note_type_path(nt), class: "text-xs text-blue-600 hover:text-blue-700 font-medium" %>
+            <%= link_to "Rename", edit_note_type_path(nt), class: "text-xs text-blue-600 hover:text-blue-700 font-medium" %>
+            <%= button_to "Delete", note_type_path(nt), method: :delete, class: "text-xs text-gray-400 hover:text-red-600 font-medium", data: { turbo_confirm: "Are you sure?" } %>
           </div>
         </div>
       <% end %>

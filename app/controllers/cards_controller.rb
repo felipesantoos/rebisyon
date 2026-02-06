@@ -8,6 +8,16 @@ class CardsController < ApplicationController
   def show
     @note = @card.note
     @deck = @card.deck
+    @note_type = @note.note_type
+    @reviews = @card.reviews.order(created_at: :desc)
+
+    review_times = @reviews.pluck(:time_ms)
+    @card_stats = {
+      reviews: @reviews.count,
+      lapses: @card.lapses,
+      average_time: review_times.any? ? "#{(review_times.sum.to_f / review_times.size / 1000).round(1)}s" : "---",
+      total_time: review_times.any? ? format_duration_ms(review_times.sum) : "---"
+    }
   end
 
   # GET /cards/:id/edit
@@ -77,5 +87,20 @@ class CardsController < ApplicationController
 
   def card_params
     params.require(:card).permit(:flag, :suspended, :buried)
+  end
+
+  def format_duration_ms(ms)
+    total_seconds = ms / 1000
+    if total_seconds < 60
+      "#{total_seconds}s"
+    elsif total_seconds < 3600
+      minutes = total_seconds / 60
+      seconds = total_seconds % 60
+      "#{minutes}m #{seconds}s"
+    else
+      hours = total_seconds / 3600
+      minutes = (total_seconds % 3600) / 60
+      "#{hours}h #{minutes}m"
+    end
   end
 end

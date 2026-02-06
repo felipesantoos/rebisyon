@@ -1,40 +1,42 @@
 <% content_for :title, "Flag Names" %>
 <% content_for :page_title, "Flag Names" %>
-<% mock = mock_flag_names %>
+<% flag_colors = { 1 => "#EF4444", 2 => "#F97316", 3 => "#22C55E", 4 => "#3B82F6", 5 => "#EC4899", 6 => "#14B8A6", 7 => "#8B5CF6" } %>
 
 <div class="max-w-xl mx-auto space-y-6">
   <p class="text-sm text-gray-500">Customize the names for your 7 card flags.</p>
 
   <div class="card p-0">
     <div class="divide-y divide-gray-200">
-      <% mock.each do |flag| %>
+      <% @flags.each do |flag| %>
         <div class="flex items-center gap-4 px-4 py-3 group">
           <%# Color swatch %>
-          <div class="w-6 h-6 rounded-md flex-shrink-0 shadow-sm border border-gray-200" style="background-color: <%= flag[:color] %>"></div>
+          <div class="w-6 h-6 rounded-md flex-shrink-0 shadow-sm border border-gray-200" style="background-color: <%= flag_colors[flag.flag_number] %>"></div>
 
           <%# Flag label %>
-          <span class="text-sm text-gray-500 w-16 flex-shrink-0">Flag <%= flag[:number] %></span>
+          <span class="text-sm text-gray-500 w-16 flex-shrink-0">Flag <%= flag.flag_number %></span>
 
           <%# Inline edit name %>
-          <input type="text" value="<%= flag[:name] %>"
-                 placeholder="Unnamed"
-                 class="form-input flex-1">
-
-          <%# Actions %>
-          <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-            <button class="p-1.5 text-gray-400 hover:text-blue-600 rounded hover:bg-blue-50" title="Save">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-              </svg>
-            </button>
-            <% if flag[:name].present? %>
-              <button class="p-1.5 text-gray-400 hover:text-red-600 rounded hover:bg-red-50" title="Clear">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                </svg>
-              </button>
+          <% if flag.persisted? %>
+            <%= form_with model: flag, class: "flex-1 flex items-center gap-2" do |form| %>
+              <%= form.text_field :name, value: flag.name, placeholder: "Unnamed", class: "form-input flex-1" %>
+              <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                <%= form.submit "Save", class: "p-1.5 text-gray-400 hover:text-blue-600 rounded hover:bg-blue-50 cursor-pointer text-xs font-medium" %>
+                <% if flag.name.present? %>
+                  <%= button_to flag_name_path(flag), method: :delete, class: "p-1.5 text-gray-400 hover:text-red-600 rounded hover:bg-red-50 text-xs font-medium" do %>
+                    Clear
+                  <% end %>
+                <% end %>
+              </div>
             <% end %>
-          </div>
+          <% else %>
+            <%= form_with model: flag, url: flag_names_path, class: "flex-1 flex items-center gap-2" do |form| %>
+              <%= form.hidden_field :flag_number, value: flag.flag_number %>
+              <%= form.text_field :name, placeholder: "Unnamed", class: "form-input flex-1" %>
+              <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                <%= form.submit "Save", class: "p-1.5 text-gray-400 hover:text-blue-600 rounded hover:bg-blue-50 cursor-pointer text-xs font-medium" %>
+              </div>
+            <% end %>
+          <% end %>
         </div>
       <% end %>
     </div>

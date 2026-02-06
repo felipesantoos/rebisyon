@@ -1,52 +1,42 @@
-<% content_for :title, @add_on[:name] %>
-<% content_for :page_title, @add_on[:name] %>
+<% content_for :title, @add_on.name %>
+<% content_for :page_title, @add_on.name %>
 
 <div class="max-w-2xl mx-auto space-y-6">
   <%= link_to "Back to add-ons", add_ons_path, class: "text-sm text-gray-600 hover:text-gray-900 inline-flex items-center gap-1" %>
 
-  <%# Info Card %>
   <div class="card">
     <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wider mb-3">Add-on Details</h3>
     <dl class="grid grid-cols-2 gap-3 text-sm">
       <div>
         <dt class="text-gray-500">Name</dt>
-        <dd class="font-medium text-gray-900"><%= @add_on[:name] %></dd>
+        <dd class="font-medium text-gray-900"><%= @add_on.name %></dd>
       </div>
       <div>
         <dt class="text-gray-500">Code</dt>
-        <dd class="font-medium text-gray-900 font-mono"><%= @add_on[:code] %></dd>
+        <dd class="font-medium text-gray-900 font-mono"><%= @add_on.code %></dd>
       </div>
       <div>
         <dt class="text-gray-500">Version</dt>
-        <dd class="font-medium text-gray-900"><%= @add_on[:version] %></dd>
-      </div>
-      <div>
-        <dt class="text-gray-500">Author</dt>
-        <dd class="font-medium text-gray-900"><%= @add_on[:author] %></dd>
-      </div>
-      <div class="col-span-2">
-        <dt class="text-gray-500">Description</dt>
-        <dd class="font-medium text-gray-900"><%= @add_on[:description] %></dd>
+        <dd class="font-medium text-gray-900"><%= @add_on.version %></dd>
       </div>
       <div>
         <dt class="text-gray-500">Status</dt>
         <dd>
-          <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium <%= @add_on[:enabled] ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' %>">
-            <%= @add_on[:enabled] ? "Enabled" : "Disabled" %>
+          <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium <%= @add_on.enabled ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' %>">
+            <%= @add_on.enabled ? "Enabled" : "Disabled" %>
           </span>
         </dd>
       </div>
     </dl>
   </div>
 
-  <%# Config Editor %>
-  <% if @add_on[:config] %>
+  <% if @add_on.config_json.present? %>
     <div class="card">
       <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wider mb-3">Configuration</h3>
-      <%= form_with url: add_on_path(@add_on[:id]), method: :patch do |form| %>
+      <%= form_with model: @add_on do |form| %>
         <div class="mb-4">
-          <%= form.text_area :config,
-              value: @add_on[:config],
+          <%= form.text_area :config_json,
+              value: JSON.pretty_generate(@add_on.config_json),
               class: "form-input w-full font-mono text-sm h-64 resize-y",
               spellcheck: false %>
         </div>
