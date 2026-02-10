@@ -31,7 +31,7 @@ gem "pagy", "~> 9.0"
 gem "ransack", "~> 4.0"
 gem "chartkick", "~> 5.0"
 gem "groupdate", "~> 6.0"
-gem "rubyzip", "~> 2.3"
+gem "rubyzip", "~> 3.2"
 gem "mini_magick", "~> 5.0"
 gem "image_processing", "~> 1.2"
 
