@@ -27,7 +27,7 @@ gem "devise", "~> 4.9"
 gem "devise-jwt", "~> 0.12"
 
 # Features
-gem "pagy", "~> 9.0"
+gem "pagy", "~> 43.2"
 gem "ransack", "~> 4.0"
 gem "chartkick", "~> 5.0"
 gem "groupdate", "~> 6.0"
